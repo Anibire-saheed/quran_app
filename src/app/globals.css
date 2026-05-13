@@ -1,26 +1,146 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
+@theme {
+  --color-brand-emerald: #064e3b;
+  --color-brand-emerald-light: #059669;
+  --color-brand-gold: #fbbf24;
+  --color-brand-gold-dark: #d97706;
+  
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-border: var(--border);
+  
+  --font-amiri: "Amiri", serif;
+  --font-inter: var(--font-geist-sans);
+}
+
+:root {
+  --background: #f8fafc;
+  --foreground: #0f172a;
+  --border: rgba(255, 255, 255, 0.1);
+  --glass-bg: rgba(255, 255, 255, 0.7);
+  --glass-border: rgba(255, 255, 255, 0.3);
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  :root:not(.light) {
+    --background: #020617;
+    --foreground: #f8fafc;
+    --border: rgba(30, 41, 59, 0.5);
+    --glass-bg: rgba(15, 23, 42, 0.7);
+    --glass-border: rgba(30, 41, 59, 0.5);
   }
+}
+
+html.dark {
+  --background: #020617;
+  --foreground: #f8fafc;
+  --border: rgba(30, 41, 59, 0.5);
+  --glass-bg: rgba(15, 23, 42, 0.7);
+  --glass-border: rgba(30, 41, 59, 0.5);
+}
+
+html.light {
+  --background: #f8fafc;
+  --foreground: #0f172a;
+  --border: rgba(15, 23, 42, 0.1);
+  --glass-bg: rgba(255, 255, 255, 0.7);
+  --glass-border: rgba(255, 255, 255, 0.3);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-inter);
+}
+
+.glass-effect {
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+}
+
+.islamic-gradient {
+  background: linear-gradient(135deg, var(--color-brand-emerald) 0%, var(--color-brand-emerald-light) 100%);
+}
+
+.gold-gradient {
+  background: linear-gradient(135deg, var(--color-brand-gold) 0%, var(--color-brand-gold-dark) 100%);
+}
+
+/* Arabic Text Optimization */
+.arabic-text {
+  font-family: var(--font-amiri);
+  direction: rtl;
+}
+
+@keyframes gradient {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.animate-gradient {
+  animation: gradient 5s ease infinite;
+  background-size: 200% 200%;
+}
+
+@utility no-scrollbar {
+  &::-webkit-scrollbar {
+    display: none;
+  }
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Progress bar driven by CSS variable */
+.progress-fill {
+  width: var(--fill, 0%);
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%) skewX(-12deg); }
+  100% { transform: translateX(200%) skewX(-12deg); }
+}
+
+@keyframes pulse-slow {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+.animate-shimmer {
+  animation: shimmer 2.8s ease-in-out infinite;
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  33% { transform: translateY(-18px) rotate(1deg); }
+  66% { transform: translateY(-8px) rotate(-1deg); }
+}
+
+@keyframes float-reverse {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(16px); }
+}
+
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.animate-float {
+  animation: float 7s ease-in-out infinite;
+}
+
+.animate-float-reverse {
+  animation: float-reverse 9s ease-in-out 1.5s infinite;
+}
+
+.animate-spin-slow {
+  animation: spin-slow 30s linear infinite;
 }
