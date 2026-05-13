@@ -67,7 +67,7 @@ export default function NotesPage() {
     );
   }
 
-  const notes: any[] = data?.notes ?? data?.data ?? [];
+  const notes: any[] = data?.notes ?? data?.data?.notes ?? (Array.isArray(data?.data) ? data.data : []);
 
   const startEdit = (note: any) => {
     setEditingNote(note);
@@ -96,7 +96,7 @@ export default function NotesPage() {
             <p className="text-slate-400 mt-1">Personal reflections on Quran verses.</p>
           </div>
           <div className="flex items-center gap-3">
-            <select value={sortBy} onChange={e => setSortBy(e.target.value as any)}
+            <select aria-label="Sort notes" value={sortBy} onChange={e => setSortBy(e.target.value as "newest" | "oldest")}
               className="bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-xs focus:outline-none">
               <option value="newest">Newest</option>
               <option value="oldest">Oldest</option>

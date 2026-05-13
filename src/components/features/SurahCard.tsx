@@ -1,6 +1,7 @@
 "use client";
 
 import { useAudioStore } from "@/store/useAudioStore";
+import { BookIcon } from "@/components/ui/BookIcon";
 import { Play, Pause, BookOpen, Heart } from "lucide-react";
 import { cn } from "@/utils/cn";
 import Link from "next/link";
@@ -58,7 +59,7 @@ export default function SurahCard({ surah, index = 0 }: SurahCardProps) {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.35, delay: index * 0.04, ease: "easeOut" }}
       whileHover={{ y: -4, transition: { duration: 0.2 } }}
-      className="group relative glass-effect rounded-[32px] p-6 border border-white/5 hover:border-brand-emerald-light/25 transition-colors duration-300 overflow-hidden"
+      className="group relative glass-effect rounded-[32px] p-6 border border-black/5 dark:border-white/5 hover:border-brand-emerald-light/25 transition-colors duration-300 overflow-hidden"
     >
       {/* Background Icon */}
       <div className="absolute inset-0 opacity-[0.05] group-hover:opacity-[0.1] group-hover:scale-105 transition-all duration-700 pointer-events-none">
@@ -81,12 +82,21 @@ export default function SurahCard({ surah, index = 0 }: SurahCardProps) {
 
       <div className="flex items-center justify-between mb-6 relative z-10">
         <div className={cn(
-          "w-12 h-12 rounded-xl flex items-center justify-center font-bold text-lg transition-all duration-300",
-          isCurrent
-            ? "islamic-gradient text-white shadow-lg shadow-emerald-900/30 scale-105"
-            : "bg-white/5 text-slate-400 group-hover:bg-brand-emerald/10 group-hover:text-brand-emerald-light"
+          "relative w-12 h-12 flex items-center justify-center shrink-0 transition-all duration-500",
+          isCurrent ? "scale-110" : "group-hover:scale-110"
         )}>
-          {isCurrent && isCurrentlyPlaying ? <EqualizerBars /> : surah.id}
+          {/* Book Icon Frame */}
+          <BookIcon 
+            isActive={isCurrent}
+            className="absolute inset-0 transition-transform duration-500"
+          />
+          
+          <span className={cn(
+            "relative z-10 font-black text-lg transition-colors",
+            isCurrent ? "text-brand-gold" : "text-slate-500 dark:text-slate-400 group-hover:text-brand-emerald-light"
+          )}>
+            {isCurrent && isCurrentlyPlaying ? <EqualizerBars /> : surah.id}
+          </span>
         </div>
 
         <div className="flex items-center gap-2">
@@ -133,7 +143,7 @@ export default function SurahCard({ surah, index = 0 }: SurahCardProps) {
               <span className="capitalize">{surah.revelation_place}</span>
             </div>
           </div>
-          <span className="arabic-text text-2xl text-slate-300 group-hover:text-brand-gold transition-colors duration-200">
+          <span className="arabic-text text-2xl text-slate-400 dark:text-slate-300 group-hover:text-brand-gold transition-colors duration-200">
             {surah.name_arabic}
           </span>
         </div>

@@ -7,6 +7,7 @@ import BottomNav from "@/components/layout/BottomNav";
 import { BookOpen, Search, ArrowRight, Clock, Sparkles } from "lucide-react";
 import { useState } from "react";
 import Link from "next/link";
+import { BookIcon } from "@/components/ui/BookIcon";
 import { cn } from "@/utils/cn";
 
 export default function ReadingPage() {
@@ -63,12 +64,12 @@ export default function ReadingPage() {
             </div>
           </div>
         ) : (
-          <div className="glass-effect rounded-3xl p-8 border-white/10 mb-12 flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="glass-effect rounded-3xl p-8 border-black/5 dark:border-white/10 mb-12 flex flex-col md:flex-row items-center justify-between gap-6">
             <div>
-              <h3 className="text-xl font-bold mb-1">Start your journey</h3>
-              <p className="text-sm text-slate-400">Select a Surah below to begin tracking your progress.</p>
+              <h3 className="text-xl font-bold mb-1 text-foreground">Start your journey</h3>
+              <p className="text-sm text-slate-500 dark:text-slate-400">Select a Surah below to begin tracking your progress.</p>
             </div>
-            <div className="p-3 rounded-full bg-white/5">
+            <div className="p-3 rounded-full bg-black/5 dark:bg-white/5">
               <Sparkles className="w-6 h-6 text-brand-gold animate-pulse" />
             </div>
           </div>
@@ -79,7 +80,7 @@ export default function ReadingPage() {
           <input 
             type="text" 
             placeholder="Search Surah..." 
-            className="w-full bg-white/5 border border-white/10 rounded-2xl py-3 pl-12 pr-4 text-sm focus:outline-none focus:ring-1 focus:ring-brand-gold/50"
+            className="w-full bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-2xl py-3 pl-12 pr-4 text-sm focus:outline-none focus:ring-1 focus:ring-brand-gold/50 text-foreground"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
@@ -97,18 +98,21 @@ export default function ReadingPage() {
               <Link 
                 key={surah.id}
                 href={`/surah/${surah.id}`}
-                className="flex items-center justify-between p-4 rounded-2xl bg-white/5 border border-white/5 hover:border-brand-emerald-light/30 hover:bg-white/10 transition-all group"
+                className="flex items-center justify-between p-4 rounded-2xl bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 hover:border-brand-emerald-light/30 hover:bg-black/10 dark:hover:bg-white/10 transition-all group"
               >
                 <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center font-bold text-slate-400 group-hover:text-brand-emerald-light transition-colors">
-                    {surah.id}
+                  <div className="relative w-12 h-12 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform duration-500">
+                    <BookIcon className="absolute inset-0 transition-transform duration-500" />
+                    <span className="relative z-10 font-black text-slate-500 dark:text-slate-400 group-hover:text-brand-emerald-light transition-colors text-sm">
+                      {surah.id}
+                    </span>
                   </div>
                   <div>
-                    <h4 className="font-bold text-sm">{surah.name_simple}</h4>
+                    <h4 className="font-bold text-sm text-foreground">{surah.name_simple}</h4>
                     <p className="text-[10px] text-slate-500 uppercase tracking-widest">{surah.verses_count} Ayahs</p>
                   </div>
                 </div>
-                <span className="arabic-text text-xl text-slate-300 group-hover:text-brand-gold transition-colors">{surah.name_arabic}</span>
+                <span className="arabic-text text-xl text-slate-700 dark:text-slate-300 group-hover:text-brand-gold transition-colors">{surah.name_arabic}</span>
               </Link>
             ))}
           </div>

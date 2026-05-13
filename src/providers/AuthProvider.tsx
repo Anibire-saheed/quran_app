@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useEffect, useState, useCallback } from "react";
 import { setAuthToken, setContentToken, notifyContentTokenReady } from "@/services/api/axios";
+import { fetchUserProfile } from "@/services/quranService";
 import axios from "axios";
 
 interface User {
@@ -60,6 +61,23 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
           
           if (storedUser) {
             setUser(JSON.parse(storedUser));
+          } else {
+            // Token exists but user info is missing - fetch it
+            try {
+              const response = await fetchUserProfile({ qdc: true });
+              const userData = response?.user ?? response?.data ?? response;
+              
+              if (userData) {
+                // Normalize name
+                if (!userData.name) {
+                  userData.name = `${userData.firstName ?? ""} ${userData.lastName ?? ""}`.trim() || userData.username || "User";
+                }
+                setUser(userData);
+                localStorage.setItem("qf_user", JSON.stringify(userData));
+              }
+            } catch (err: any) {
+              console.warn("Profile fetch failed, but keeping session:", err);
+            }
           }
         }
       } catch (error) {

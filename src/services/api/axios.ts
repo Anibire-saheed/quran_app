@@ -20,7 +20,7 @@ export function notifyContentTokenReady() {
 // ─── Quran Foundation V4 API Base URLs
 const QURAN_FOUNDATION_API_URL = process.env.NEXT_PUBLIC_QF_CONTENT_BASE_URL || 'https://apis-prelive.quran.foundation/content/api/v4';
 const QURAN_FOUNDATION_SEARCH_URL = process.env.NEXT_PUBLIC_QF_SEARCH_BASE_URL || 'https://apis-prelive.quran.foundation/search';
-const QURAN_FOUNDATION_AUTH_URL = process.env.NEXT_PUBLIC_QF_AUTH_BASE_URL || 'https://apis-prelive.quran.foundation/user/api/v1';
+const QURAN_FOUNDATION_AUTH_URL = process.env.NEXT_PUBLIC_QF_AUTH_BASE_URL || 'https://apis-prelive.quran.foundation/quran-reflect';
 const QURAN_FOUNDATION_REFLECT_URL = process.env.NEXT_PUBLIC_QF_REFLECT_BASE_URL || 'https://apis-prelive.quran.foundation/quran-reflect';
 const QURAN_FOUNDATION_OAUTH_URL = process.env.NEXT_PUBLIC_QF_OAUTH_BASE_URL || 'https://prelive-oauth2.quran.foundation';
 
@@ -72,6 +72,21 @@ export const quranReflectApi = axios.create({
     'x-client-id': CLIENT_ID,
   }
 });
+
+// Interceptor to inject user auth token into Auth and Reflect requests
+const _authInterceptor = (config: any) => {
+  if (typeof window !== 'undefined') {
+    const token = localStorage.getItem('qf_access_token');
+    if (token) {
+      config.headers['Authorization'] = `Bearer ${token}`;
+      config.headers['x-auth-token'] = token;
+    }
+  }
+  return config;
+};
+
+quranAuthApi.interceptors.request.use(_authInterceptor);
+quranReflectApi.interceptors.request.use(_authInterceptor);
 
 /**
  * Sets the Content API token (obtained via client_credentials)

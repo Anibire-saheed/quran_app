@@ -1,0 +1,21 @@
+yarn run v1.22.22
+$ next dev
+[32m✔[0m [33mConsole Ninja[0m extension is connected to [33mNext.js[0m, see [36mhttps://tinyurl.com/2vt8jxzw[0m
+⚠ Console Ninja Turbopack support is a PRO feature, [33mcurrently available to community users while in preview[0m
+⚠ Port 3000 is in use by process 29170, using available port 3001 instead.
+▲ Next.js 16.2.6 (Turbopack)
+- Local:         http://localhost:3001
+- Network:       http://172.20.10.2:3001
+- Environments: .env.local
+✓ Ready in 708ms
+⨯ Another next dev server is already running.
+
+- Local:        http://localhost:3000
+- PID:          29170
+- Dir:          /Users/user/quran_hackton
+- Log:          .next/dev/logs/next-development.log
+
+Run kill 29170 to stop it.
+[?25h
+error Command failed with exit code 1.
+info Visit https://yarnpkg.com/en/docs/cli/run for documentation about this command.

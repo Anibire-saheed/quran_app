@@ -27,7 +27,7 @@ export async function GET() {
       `${oauthBase}/oauth2/token`,
       new URLSearchParams({
         grant_type: "client_credentials",
-        scope: "content",
+        scope: "content search audio post.read comment.read",
       }),
       {
         headers: {

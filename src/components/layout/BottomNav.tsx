@@ -7,11 +7,11 @@ import { cn } from "@/utils/cn";
 import { motion } from "framer-motion";
 
 const navItems = [
-  { icon: Home, label: "Home", href: "/dashboard" },
-  { icon: Search, label: "Search", href: "/search" },
-  { icon: BookOpen, label: "Read", href: "/reading" },
-  { icon: Music, label: "Audio", href: "/reciters" },
-  { icon: Heart, label: "Saved", href: "/favorites" },
+  { icon: Home,     label: "Home",   href: "/dashboard" },
+  { icon: Search,   label: "Search", href: "/search"    },
+  { icon: BookOpen, label: "Read",   href: "/reading"   },
+  { icon: Music,    label: "Audio",  href: "/reciters"  },
+  { icon: Heart,    label: "Saved",  href: "/favorites" },
 ];
 
 export default function BottomNav() {
@@ -21,8 +21,10 @@ export default function BottomNav() {
     <motion.nav
       initial={{ y: 80, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
-      transition={{ duration: 0.4, ease: "easeOut" }}
-      className="lg:hidden fixed bottom-0 left-0 right-0 h-16 border-t border-white/10 glass-effect flex items-center justify-around px-2 z-50"
+      transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+      className="lg:hidden fixed bottom-0 left-0 right-0 h-16 z-50 flex items-center justify-around px-2
+        border-t border-slate-200 bg-white/90 backdrop-blur-xl
+        dark:border-white/10 dark:bg-slate-900/90"
     >
       {navItems.map((item) => {
         const isActive = pathname === item.href;
@@ -46,16 +48,22 @@ export default function BottomNav() {
               <item.icon
                 className={cn(
                   "w-5 h-5 transition-colors duration-200",
-                  isActive ? "text-brand-emerald-light" : "text-slate-400"
+                  isActive
+                    ? "text-brand-emerald-light"
+                    : "text-slate-500 dark:text-slate-400"
                 )}
               />
             </motion.div>
-            <motion.span
-              animate={{ color: isActive ? "#059669" : "#94a3b8" }}
-              className="text-[10px] font-semibold"
+            <span
+              className={cn(
+                "text-[10px] font-semibold transition-colors duration-200",
+                isActive
+                  ? "text-brand-emerald-light"
+                  : "text-slate-500 dark:text-slate-400"
+              )}
             >
               {item.label}
-            </motion.span>
+            </span>
           </Link>
         );
       })}

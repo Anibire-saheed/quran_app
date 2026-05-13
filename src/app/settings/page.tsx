@@ -4,7 +4,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { fetchPreferences, updatePreference, fetchLanguages, fetchAyahRecitations, fetchAvailableTranslations } from "@/services/quranService";
 import Sidebar from "@/components/layout/Sidebar";
 import BottomNav from "@/components/layout/BottomNav";
-import { Settings, Moon, Sun, Type, Languages, Music, Globe, Check, Save } from "lucide-react";
+import { Settings, Moon, Sun, Type, Music, Globe } from "lucide-react";
 import { useState, useEffect } from "react";
 import { cn } from "@/utils/cn";
 import { useThemeStore } from "@/store/useThemeStore";
@@ -83,22 +83,18 @@ export default function SettingsPage() {
                   <p className="font-bold text-sm">Theme Mode</p>
                   <p className="text-xs text-slate-500">Switch between light and dark modes.</p>
                 </div>
-                <div className="flex bg-white/5 p-1 rounded-xl border border-white/10">
+                <div className="flex bg-black/5 dark:bg-white/5 p-1 rounded-xl border border-black/10 dark:border-white/10">
                   <button
+                    type="button"
                     onClick={() => setThemeMode('light')}
-                    className={cn("px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5", themeMode === 'light' ? "bg-white text-black" : "text-slate-400")}
+                    className={cn("px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5", themeMode === 'light' ? "bg-white text-slate-900 shadow-sm dark:bg-white dark:text-black" : "text-slate-500 dark:text-slate-400")}
                   >
                     <Sun className="w-3.5 h-3.5" /> Light
                   </button>
                   <button
-                    onClick={() => setThemeMode('system')}
-                    className={cn("px-4 py-2 rounded-lg text-xs font-bold transition-all", themeMode === 'system' ? "bg-white text-black" : "text-slate-400")}
-                  >
-                    System
-                  </button>
-                  <button
+                    type="button"
                     onClick={() => setThemeMode('dark')}
-                    className={cn("px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5", themeMode === 'dark' ? "bg-white text-black" : "text-slate-400")}
+                    className={cn("px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5", themeMode === 'dark' ? "bg-slate-800 text-white shadow-sm dark:bg-white dark:text-black" : "text-slate-500 dark:text-slate-400")}
                   >
                     <Moon className="w-3.5 h-3.5" /> Dark
                   </button>
@@ -120,7 +116,8 @@ export default function SettingsPage() {
                   <p className="font-bold text-sm">Arabic Script</p>
                   <p className="text-xs text-slate-500">Choose your preferred Quranic script.</p>
                 </div>
-                <select 
+                <select
+                  aria-label="Arabic script"
                   className="bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-sm focus:outline-none"
                   value={localSettings.quranReaderStyles?.quranFont || 'uthmani'}
                   onChange={(e) => handleUpdate('quranReaderStyles', 'quranFont', e.target.value)}
@@ -136,8 +133,9 @@ export default function SettingsPage() {
                   <p className="font-bold text-sm">Translation</p>
                   <p className="text-xs text-slate-500">Select the default translation to display.</p>
                 </div>
-                <select 
-                  className="bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-sm max-w-[200px] focus:outline-none"
+                <select
+                  aria-label="Default translation"
+                  className="bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-sm max-w-50 focus:outline-none"
                   value={localSettings.translations?.selectedId || '131'}
                   onChange={(e) => handleUpdate('translations', 'selectedId', e.target.value)}
                 >
@@ -162,8 +160,9 @@ export default function SettingsPage() {
                   <p className="font-bold text-sm">Default Reciter</p>
                   <p className="text-xs text-slate-500">Your preferred voice for ayah recitations.</p>
                 </div>
-                <select 
-                  className="bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-sm max-w-[200px] focus:outline-none"
+                <select
+                  aria-label="Default reciter"
+                  className="bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-sm max-w-50 focus:outline-none"
                   value={localSettings.audio?.reciter || '2'}
                   onChange={(e) => handleUpdate('audio', 'reciter', e.target.value)}
                 >
@@ -188,7 +187,8 @@ export default function SettingsPage() {
                   <p className="font-bold text-sm">App Language</p>
                   <p className="text-xs text-slate-500">The language used throughout the interface.</p>
                 </div>
-                <select 
+                <select
+                  aria-label="App language"
                   className="bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-sm focus:outline-none"
                   value={localSettings.language?.selected || 'en'}
                   onChange={(e) => handleUpdate('language', 'selected', e.target.value)}
@@ -203,7 +203,7 @@ export default function SettingsPage() {
         </div>
 
         {mutation.isPending && (
-          <div className="fixed bottom-20 left-1/2 -translate-x-1/2 bg-brand-emerald text-white px-6 py-3 rounded-2xl font-bold flex items-center gap-2 shadow-2xl z-[100]">
+          <div className="fixed bottom-20 left-1/2 -translate-x-1/2 bg-brand-emerald text-white px-6 py-3 rounded-2xl font-bold flex items-center gap-2 shadow-2xl z-100">
             <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
             Saving changes...
           </div>

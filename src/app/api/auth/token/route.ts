@@ -30,7 +30,30 @@ export async function POST(request: Request) {
 
     const data = response.data;
     
-    const nextResponse = NextResponse.json(data);
+    // Fetch user profile using the new token
+    let user = null;
+    try {
+      if (data.access_token) {
+        const profileResponse = await axios.get(
+          `${process.env.NEXT_PUBLIC_QF_REFLECT_BASE_URL || "https://apis-prelive.quran.foundation/quran-reflect"}/v1/users/profile`,
+          {
+            headers: {
+              "Authorization": `Bearer ${data.access_token}`,
+              "x-client-id": clientId,
+            },
+          }
+        );
+        user = profileResponse.data.data || profileResponse.data;
+        // Normalize name for consistency
+        if (user && !user.name) {
+          user.name = `${user.firstName ?? ""} ${user.lastName ?? ""}`.trim() || user.username;
+        }
+      }
+    } catch (profileError) {
+      console.error("Failed to fetch profile during token exchange:", profileError);
+    }
+
+    const nextResponse = NextResponse.json({ ...data, user });
     
     // Set secure cookie for middleware protection
     if (data.access_token) {

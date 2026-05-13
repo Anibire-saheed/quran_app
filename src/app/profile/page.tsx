@@ -4,7 +4,7 @@ import Sidebar from "@/components/layout/Sidebar";
 import BottomNav from "@/components/layout/BottomNav";
 import {
   User, Calendar, BookOpen, Clock, Heart, Award, Edit2, X, Check,
-  Users, UserPlus, UserMinus, ChevronRight,
+  Users, UserPlus, UserMinus, ChevronRight, AlertCircle,
 } from "lucide-react";
 import { cn } from "@/utils/cn";
 import { useState } from "react";
@@ -175,14 +175,39 @@ export default function ProfilePage() {
     );
   }
 
-  if (!isAuthenticated || !profile) {
+  if (!isAuthenticated) {
     return (
       <div className="flex min-h-screen bg-background text-foreground">
         <Sidebar />
         <main className="flex-1 lg:ml-64 p-10 flex flex-col items-center justify-center">
-          <User className="w-20 h-20 text-slate-700 mb-8" />
-          <h2 className="text-3xl font-black mb-4">Your Profile</h2>
-          <p className="text-slate-500 text-center max-w-md mb-10">Sign in to view and edit your profile.</p>
+          <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="text-center">
+            <div className="w-24 h-24 rounded-full bg-slate-100 dark:bg-white/5 flex items-center justify-center mx-auto mb-8">
+              <User className="w-12 h-12 text-slate-400" />
+            </div>
+            <h2 className="text-3xl font-black mb-4">Your Profile</h2>
+            <p className="text-slate-500 max-w-sm mb-10">Sign in to sync your progress, save favorites, and connect with the community.</p>
+            <button onClick={() => window.location.href = '/login'} className="px-8 py-4 rounded-2xl islamic-gradient text-white font-black shadow-xl hover:scale-105 transition-all">
+              Sign In Now
+            </button>
+          </motion.div>
+        </main>
+      </div>
+    );
+  }
+
+  if (!profile && !isLoading) {
+    return (
+      <div className="flex min-h-screen bg-background text-foreground">
+        <Sidebar />
+        <main className="flex-1 lg:ml-64 p-10 flex flex-col items-center justify-center">
+          <div className="text-center">
+            <AlertCircle className="w-16 h-16 text-amber-500 mx-auto mb-6" />
+            <h2 className="text-2xl font-black mb-2">Profile Not Found</h2>
+            <p className="text-slate-500 mb-8">We couldn't retrieve your profile data. Please try again.</p>
+            <button onClick={() => queryClient.invalidateQueries({ queryKey: ["userProfile"] })} className="px-6 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 font-bold">
+              Retry
+            </button>
+          </div>
         </main>
       </div>
     );

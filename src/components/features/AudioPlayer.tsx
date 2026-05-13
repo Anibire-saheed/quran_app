@@ -45,18 +45,35 @@ export default function AudioPlayer() {
       setProgress((audioRef.current.currentTime / audioRef.current.duration) * 100);
     }
     if (audioFile?.segments) {
+      const { currentWord: storeWord, setCurrentWord } = useAudioStore.getState();
+      
       const currentSegment = audioFile.segments.find((seg: any) => {
         const start = seg.length === 4 ? seg[2] : seg[1];
         const end = seg.length === 4 ? seg[3] : seg[2];
         return currentTimeMs >= start && currentTimeMs <= end;
       });
+
       if (currentSegment) {
         const verseNumber = currentSegment[0];
+        const wordNumber = currentSegment.length === 4 ? currentSegment[1] : null;
+
         if (verseNumber !== currentAyah) {
           setCurrentAyah(verseNumber);
-          document.getElementById(`ayah-${verseNumber}`)?.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
+        if (wordNumber !== storeWord) {
+          setCurrentWord(wordNumber);
         }
       }
+    }
+  };
+
+  const handleEnded = () => {
+    if (isRepeat && audioRef.current) {
+      audioRef.current.currentTime = 0;
+      audioRef.current.play().catch(console.error);
+    } else {
+      setIsPlaying(false);
+      setCurrentAyah(null);
     }
   };
 
@@ -97,18 +114,18 @@ export default function AudioPlayer() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="absolute -top-6 left-0 right-0 h-6 bg-gradient-to-t from-brand-emerald/10 to-transparent pointer-events-none"
+                className="absolute -top-6 left-0 right-0 h-6 bg-linear-to-t from-brand-emerald/10 to-transparent pointer-events-none"
               />
             )}
           </AnimatePresence>
 
-          <div className="glass-effect border-t border-white/10 px-4 lg:px-8 py-3 flex items-center justify-between">
+          <div className="glass-effect border-t border-black/5 dark:border-white/10 px-4 lg:px-8 py-3 flex items-center justify-between">
             <audio
               ref={audioRef}
               src={audioSrc || undefined}
               onTimeUpdate={handleTimeUpdate}
               onLoadedMetadata={handleLoadedMetadata}
-              onEnded={() => setIsPlaying(false)}
+              onEnded={handleEnded}
             />
 
             {/* Surah Info */}
@@ -124,8 +141,8 @@ export default function AudioPlayer() {
                 <span className="relative z-10 text-sm">{currentSurah.id}</span>
               </div>
               <div className="min-w-0">
-                <p className="font-bold text-sm truncate">{currentSurah.name_simple}</p>
-                <p className="text-[11px] text-slate-400 truncate capitalize">{currentSurah.revelation_place}</p>
+                <p className="font-bold text-sm truncate text-slate-900 dark:text-white">{currentSurah.name_simple}</p>
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate capitalize">{currentSurah.revelation_place}</p>
               </div>
               <button
                 type="button"
@@ -191,7 +208,7 @@ export default function AudioPlayer() {
 
               {/* Progress bar */}
               <div className="w-full flex items-center gap-3">
-                <span className="text-[10px] text-slate-400 font-mono w-8 text-right tabular-nums">
+                <span className="text-[10px] text-slate-500 dark:text-slate-400 font-mono w-8 text-right tabular-nums">
                   {formatTime(audioRef.current?.currentTime || 0)}
                 </span>
                 <div
@@ -208,7 +225,7 @@ export default function AudioPlayer() {
                     />
                   </div>
                 </div>
-                <span className="text-[10px] text-slate-400 font-mono w-8 tabular-nums">
+                <span className="text-[10px] text-slate-500 dark:text-slate-400 font-mono w-8 tabular-nums">
                   {formatTime(duration)}
                 </span>
               </div>

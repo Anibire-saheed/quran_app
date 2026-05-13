@@ -7,16 +7,25 @@ import BottomNav from "@/components/layout/BottomNav";
 import { Music, Play, Search, Info } from "lucide-react";
 import { useState } from "react";
 import { useAudioStore } from "@/store/useAudioStore";
+import { BookIcon } from "@/components/ui/BookIcon";
 import { cn } from "@/utils/cn";
 
 export default function RecitersPage() {
   const [search, setSearch] = useState("");
-  const { currentReciter, setCurrentReciter } = useAudioStore();
+  const { currentReciter, setCurrentReciter, currentSurah, setCurrentSurah, setIsPlaying } = useAudioStore();
   
   const { data: reciters, isLoading } = useQuery({
     queryKey: ["chapter-reciters"],
     queryFn: () => fetchChapterReciters(),
   });
+
+  const handleReciterSelect = (reciter: any) => {
+    setCurrentReciter(String(reciter.id));
+    if (!currentSurah) {
+      setCurrentSurah({ id: 1, name_simple: "Al-Fatiha", revelation_place: "makkah" });
+    }
+    setIsPlaying(true);
+  };
 
   const filteredReciters = reciters?.filter((r: any) => {
     const name = r.name || r.translated_name?.name || "";
@@ -44,7 +53,7 @@ export default function RecitersPage() {
           <input 
             type="text" 
             placeholder="Search reciters..." 
-            className="w-full bg-white/5 border border-white/10 rounded-2xl py-3 pl-12 pr-4 text-sm focus:outline-none focus:ring-1 focus:ring-brand-gold/50"
+            className="w-full bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-2xl py-3 pl-12 pr-4 text-sm focus:outline-none focus:ring-1 focus:ring-brand-gold/50 text-foreground"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
@@ -66,7 +75,7 @@ export default function RecitersPage() {
               return (
                 <button 
                   key={reciter.id}
-                  onClick={() => setCurrentReciter(String(reciter.id))}
+                  onClick={() => handleReciterSelect(reciter)}
                   className={cn(
                     "flex items-center justify-between p-4 rounded-2xl border transition-all duration-300 text-left group",
                     isActive 
@@ -76,10 +85,19 @@ export default function RecitersPage() {
                 >
                   <div className="flex items-center gap-4">
                     <div className={cn(
-                      "w-12 h-12 rounded-xl flex items-center justify-center font-bold transition-all",
-                      isActive ? "islamic-gradient text-white" : "bg-white/5 text-slate-500 group-hover:scale-110"
+                      "relative w-12 h-12 flex items-center justify-center shrink-0 transition-all duration-500",
+                      isActive ? "scale-110" : "group-hover:scale-110"
                     )}>
-                      {name.charAt(0)}
+                      <BookIcon 
+                        isActive={isActive}
+                        className="absolute inset-0 transition-transform duration-500"
+                      />
+                      <span className={cn(
+                        "relative z-10 font-black text-lg transition-colors",
+                        isActive ? "text-brand-gold" : "text-slate-500 dark:text-slate-400 group-hover:text-brand-emerald-light"
+                      )}>
+                        {name.charAt(0)}
+                      </span>
                     </div>
                     <div>
                       <h4 className="font-bold text-sm">{name}</h4>

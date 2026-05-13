@@ -69,7 +69,7 @@ const fadeUp: Variants = {
 };
 
 export default function LandingPage() {
-  const { login } = useAuth();
+  const { login, isAuthenticated } = useAuth();
   const [prayerTimes, setPrayerTimes] = useState<PrayerTimes | null>(null);
   const [city] = useState("Lagos");
   const [hijriDate, setHijriDate] = useState("");
@@ -123,13 +123,21 @@ export default function LandingPage() {
         </div>
 
         <div className="hidden lg:flex items-center gap-4">
-          <button type="button" onClick={login} className="text-sm font-semibold text-white/60 hover:text-white transition-colors">
-            Sign In
-          </button>
-          <button type="button" onClick={login}
-            className="px-6 py-2.5 rounded-full bg-white text-black font-bold text-sm hover:bg-amber-400 transition-colors">
-            Get Started
-          </button>
+          {isAuthenticated ? (
+            <Link href="/chapters" className="px-6 py-2.5 rounded-full bg-white text-black font-bold text-sm hover:bg-amber-400 transition-colors">
+              Dashboard
+            </Link>
+          ) : (
+            <>
+              <button type="button" onClick={login} className="text-sm font-semibold text-white/60 hover:text-white transition-colors">
+                Sign In
+              </button>
+              <button type="button" onClick={login}
+                className="px-6 py-2.5 rounded-full bg-white text-black font-bold text-sm hover:bg-amber-400 transition-colors">
+                Get Started
+              </button>
+            </>
+          )}
         </div>
 
         <button type="button" aria-label="Toggle menu" onClick={() => setMenuOpen((o) => !o)}
@@ -145,10 +153,17 @@ export default function LandingPage() {
             className="fixed top-16 inset-x-0 z-40 glass-effect border-b border-white/10 p-6 flex flex-col gap-4 lg:hidden">
             <Link href="#features" onClick={() => setMenuOpen(false)} className="font-semibold hover:text-amber-400 transition-colors">Features</Link>
             <Link href="#prayer" onClick={() => setMenuOpen(false)} className="font-semibold hover:text-amber-400 transition-colors">Prayer Times</Link>
-            <button type="button" onClick={() => { login(); setMenuOpen(false); }}
-              className="px-6 py-3 rounded-2xl islamic-gradient text-white font-bold text-sm w-fit">
-              Get Started
-            </button>
+            {isAuthenticated ? (
+              <Link href="/chapters" onClick={() => setMenuOpen(false)}
+                className="px-6 py-3 rounded-2xl islamic-gradient text-white font-bold text-sm w-fit text-center">
+                Go to Dashboard
+              </Link>
+            ) : (
+              <button type="button" onClick={() => { login(); setMenuOpen(false); }}
+                className="px-6 py-3 rounded-2xl islamic-gradient text-white font-bold text-sm w-fit">
+                Get Started
+              </button>
+            )}
           </motion.div>
         )}
       </AnimatePresence>
@@ -238,11 +253,19 @@ export default function LandingPage() {
             transition={{ delay: 1.2, duration: 0.6 }}
             className="flex flex-col sm:flex-row items-center justify-center gap-4"
           >
-            <button type="button" onClick={login}
-              className="group flex items-center gap-3 bg-white text-black px-10 py-5 rounded-2xl font-black text-lg hover:bg-amber-400 transition-all hover:scale-105 shadow-2xl active:scale-95">
-              Start Reading Free
-              <ArrowRight className="w-5 h-5 group-hover:translate-x-1.5 transition-transform" />
-            </button>
+            {isAuthenticated ? (
+              <Link href="/chapters"
+                className="group flex items-center gap-3 bg-white text-black px-10 py-5 rounded-2xl font-black text-lg hover:bg-amber-400 transition-all hover:scale-105 shadow-2xl active:scale-95">
+                Go to Dashboard
+                <ArrowRight className="w-5 h-5 group-hover:translate-x-1.5 transition-transform" />
+              </Link>
+            ) : (
+              <button type="button" onClick={login}
+                className="group flex items-center gap-3 bg-white text-black px-10 py-5 rounded-2xl font-black text-lg hover:bg-amber-400 transition-all hover:scale-105 shadow-2xl active:scale-95">
+                Start Reading Free
+                <ArrowRight className="w-5 h-5 group-hover:translate-x-1.5 transition-transform" />
+              </button>
+            )}
           </motion.div>
         </motion.div>
 

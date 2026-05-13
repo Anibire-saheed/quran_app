@@ -14,8 +14,9 @@ import {
   ChevronLeft, Play, Bookmark, BookmarkCheck, Share2, Info, X, MessageSquare,
   AlertCircle, ScrollText, FileText, Plus, Trash2, ChevronDown, Check,
 } from "lucide-react";
+import { BookIcon } from "@/components/ui/BookIcon";
 import { useAudioStore } from "@/store/useAudioStore";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/utils/cn";
 import { useAuth } from "@/hooks/useAuth";
@@ -89,12 +90,35 @@ export default function SurahDetailPage() {
   const { id } = useParams();
   const router = useRouter();
   const queryClient = useQueryClient();
-  const { setCurrentSurah, setIsPlaying, currentAyah } = useAudioStore();
+  const { setCurrentSurah, setIsPlaying, currentAyah, currentWord } = useAudioStore();
   const { isAuthenticated } = useAuth();
 
   const [panelMode, setPanelMode] = useState<PanelMode>(null);
   const [activeAyah, setActiveAyah] = useState<string | null>(null);
   const [page, setPage] = useState(1);
+
+  // Synchronized Auto-Scroll with Pagination Support
+  useEffect(() => {
+    if (currentAyah == null) return;
+    const perPage = 20;
+    const ayahPage = Math.ceil(currentAyah / perPage);
+    
+    // If active ayah is on a different page, navigate to it
+    if (ayahPage !== page) {
+      setPage(ayahPage);
+      return;
+    }
+    
+    // Smooth scroll to the ayah once on the correct page
+    const timerId = setTimeout(() => {
+      document.getElementById(`ayah-${currentAyah}`)?.scrollIntoView({ 
+        behavior: "smooth", 
+        block: "center" 
+      });
+    }, 100);
+    
+    return () => clearTimeout(timerId);
+  }, [currentAyah, page]);
   const [script, setScript] = useState("uthmani");
   const [translationId, setTranslationId] = useState("131");
   const [tafsirId, setTafsirId] = useState("169");
@@ -234,12 +258,16 @@ export default function SurahDetailPage() {
   const totalPages = verseResponse?.meta?.pagination?.total_pages ?? verseResponse?.pagination?.total_pages ?? 1;
 
   const openPanel = (mode: PanelMode, verseKey?: string) => {
-    setActiveAyah(verseKey ?? null);
+    setActiveAyah(verseKey || null);
     setPanelMode(mode);
     setNoteText("");
     setEditingNoteId(null);
   };
-  const closePanel = () => { setPanelMode(null); setActiveAyah(null); };
+
+  const closePanel = () => {
+    setPanelMode(null);
+    setActiveAyah(null);
+  };
 
   return (
     <div className="min-h-screen bg-background text-foreground pb-40 lg:pb-32">
@@ -250,7 +278,7 @@ export default function SurahDetailPage() {
         {/* Header */}
         <div className="flex items-center justify-between mb-6 gap-2 flex-wrap">
           <button type="button" onClick={() => router.back()} aria-label="Go back"
-            className="p-2 rounded-xl hover:bg-white/5 transition-colors group shrink-0">
+            className="p-2 rounded-xl hover:bg-black/5 dark:hover:bg-white/5 transition-colors group shrink-0">
             <ChevronLeft className="w-6 h-6 group-hover:-translate-x-1 transition-transform" />
           </button>
           <div className="flex items-center gap-2 flex-wrap">
@@ -262,7 +290,7 @@ export default function SurahDetailPage() {
               <Dropdown label="Tafsir" options={tafsirOptions} value={tafsirId} onChange={setTafsirId} />
             )}
             <button type="button" onClick={() => openPanel("info")}
-              className="p-2 rounded-xl hover:bg-white/5 text-brand-gold transition-colors" aria-label="Chapter info">
+              className="p-2 rounded-xl hover:bg-black/5 dark:hover:bg-white/5 text-brand-gold transition-colors" aria-label="Chapter info">
               <Info className="w-5 h-5" />
             </button>
           </div>
@@ -272,7 +300,7 @@ export default function SurahDetailPage() {
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-16">
           <h1 className="arabic-text text-6xl lg:text-8xl mb-6 text-brand-gold">{chapter.name_arabic}</h1>
           <h2 className="text-3xl font-black mb-2">{chapter.name_simple}</h2>
-          <p className="text-slate-400 uppercase tracking-[0.2em] text-sm font-bold mb-8">
+          <p className="text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em] text-sm font-bold mb-8">
             {chapter.revelation_place} • {chapter.verses_count} Ayahs
           </p>
           <div className="flex items-center justify-center gap-4">
@@ -321,16 +349,24 @@ export default function SurahDetailPage() {
                 <div className="flex-1 text-right w-full">
                   <p className={cn(
                     "arabic-text text-3xl lg:text-5xl leading-[2] lg:leading-[1.8] transition-colors duration-500",
-                    isCurrentAyah ? "text-white" : "text-slate-100 group-hover:text-brand-gold"
+                    isCurrentAyah ? "text-brand-gold drop-shadow-[0_0_8px_rgba(251,191,36,0.3)]" : "text-slate-800 dark:text-slate-100 group-hover:text-brand-gold"
                   )}>
                     {displayText}
                     <span className={cn(
-                      "inline-flex items-center justify-center w-10 h-10 rounded-full border text-xs font-bold mr-4 font-sans transition-colors",
-                      isCurrentAyah
-                        ? "border-brand-emerald text-brand-emerald shadow-lg shadow-emerald-500/20"
-                        : "border-brand-gold/30 text-brand-gold"
+                      "relative inline-flex items-center justify-center w-12 h-12 mr-4 font-sans transition-all duration-500",
+                      isCurrentAyah ? "scale-110" : "group-hover:scale-105"
                     )}>
-                      {verse.verse_number}
+                      {/* Book Icon Frame */}
+                      <BookIcon 
+                        isActive={isCurrentAyah}
+                        className="absolute inset-0 transition-transform duration-500"
+                      />
+                      <span className={cn(
+                        "relative z-10 text-xs font-black",
+                        isCurrentAyah ? "text-brand-gold" : "text-brand-emerald-light"
+                      )}>
+                        {verse.verse_number}
+                      </span>
                     </span>
                   </p>
                 </div>
@@ -340,18 +376,33 @@ export default function SurahDetailPage() {
                     <p className="text-brand-emerald-light/80 italic text-sm" dangerouslySetInnerHTML={{ __html: transliteration }} />
                   )}
                   {translation && (
-                    <div className="text-lg text-slate-300 leading-relaxed" dangerouslySetInnerHTML={{ __html: translation }} />
+                    <div className="text-lg text-slate-700 dark:text-slate-300 leading-relaxed" dangerouslySetInnerHTML={{ __html: translation }} />
                   )}
                 </div>
 
                 {verse.words && verse.words.length > 0 && (
                   <div className="mt-6 flex flex-wrap flex-row-reverse gap-4">
-                    {verse.words.map((word, wi) => (
-                      <div key={wi} className="flex flex-col items-center group/word">
-                        <span className="arabic-text text-2xl text-slate-400 group-hover/word:text-brand-gold transition-colors">{word.text_uthmani}</span>
-                        <span className="text-[10px] text-slate-600 group-hover/word:text-slate-300 transition-colors">{word.translation?.text}</span>
-                      </div>
-                    ))}
+                    {verse.words.map((word, wi) => {
+                      const isCurrentWord = isCurrentAyah && currentWord === (word.position || wi + 1);
+                      return (
+                        <div key={wi} className="flex flex-col items-center group/word">
+                          <span className={cn(
+                            "arabic-text text-2xl transition-all duration-300",
+                            isCurrentWord 
+                              ? "text-brand-gold scale-110 drop-shadow-[0_0_8px_rgba(251,191,36,0.4)]" 
+                              : "text-slate-400 group-hover/word:text-brand-gold"
+                          )}>
+                            {word.text_uthmani}
+                          </span>
+                          <span className={cn(
+                            "text-[10px] transition-colors duration-300",
+                            isCurrentWord ? "text-slate-200" : "text-slate-600 group-hover/word:text-slate-300"
+                          )}>
+                            {word.translation?.text}
+                          </span>
+                        </div>
+                      );
+                    })}
                   </div>
                 )}
 
@@ -359,7 +410,7 @@ export default function SurahDetailPage() {
                 <div className="mt-6 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity flex-wrap">
                   <button type="button" aria-label="Play ayah"
                     onClick={() => { setCurrentSurah(chapter); setIsPlaying(true); }}
-                    className="p-2 rounded-lg hover:bg-white/5 text-slate-500 hover:text-white transition-colors">
+                    className="p-2 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 text-slate-500 hover:text-black dark:hover:text-white transition-colors">
                     <Play className="w-4 h-4 fill-current" />
                   </button>
                   <button type="button" onClick={() => openPanel("hadith", verse.verse_key)}
