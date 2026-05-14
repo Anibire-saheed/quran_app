@@ -20,7 +20,12 @@ export default function ChaptersPage() {
 
   const { data: juzs, isLoading: isJuzsLoading } = useQuery({
     queryKey: ["juzs"],
-    queryFn: () => fetchJuzs(),
+    queryFn: async () => {
+      const data = await fetchJuzs();
+      // Filter out duplicate juz entries by juz_number
+      const uniqueJuzs = Array.from(new Map(data.map((j: any) => [j.juz_number, j])).values());
+      return uniqueJuzs;
+    },
     enabled: viewMode === 'juz',
   });
 
@@ -30,11 +35,11 @@ export default function ChaptersPage() {
     <div className="flex min-h-screen bg-background text-foreground">
       <Sidebar />
       
-      <main className="flex-1 lg:ml-64 p-8">
+      <main className="flex-1 lg:ml-[280px] p-8">
         <header className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div>
-            <h1 className="text-4xl font-bold text-slate-900 dark:text-white mb-2">Holy Quran</h1>
-            <p className="text-slate-400">
+            <h1 className="text-4xl font-bold text-foreground mb-2">Holy Quran</h1>
+            <p className="text-foreground/50">
               {viewMode === 'surah' ? "Browse and read all 114 Surahs of the Noble Quran." : "Explore the Quran through its 30 Juz divisions."}
             </p>
           </div>
@@ -46,8 +51,8 @@ export default function ChaptersPage() {
               className={cn(
                 "px-6 py-2.5 rounded-xl text-sm font-black transition-all duration-300",
                 viewMode === 'surah' 
-                  ? "bg-white dark:bg-white/10 text-brand-emerald-light dark:text-brand-gold shadow-lg shadow-black/5" 
-                  : "text-slate-500 hover:text-slate-800 dark:hover:text-white"
+                  ? "bg-white dark:bg-white/10 text-brand-emerald dark:text-brand-gold shadow-lg shadow-black/5" 
+                  : "text-foreground/40 hover:text-foreground"
               )}
             >
               Surah
@@ -57,8 +62,8 @@ export default function ChaptersPage() {
               className={cn(
                 "px-6 py-2.5 rounded-xl text-sm font-black transition-all duration-300",
                 viewMode === 'juz' 
-                  ? "bg-white dark:bg-white/10 text-brand-emerald-light dark:text-brand-gold shadow-lg shadow-black/5" 
-                  : "text-slate-500 hover:text-slate-800 dark:hover:text-white"
+                  ? "bg-white dark:bg-white/10 text-brand-emerald dark:text-brand-gold shadow-lg shadow-black/5" 
+                  : "text-foreground/40 hover:text-foreground"
               )}
             >
               Juz
@@ -79,7 +84,7 @@ export default function ChaptersPage() {
                 <Link
                   key={chapter.id}
                   href={`/surah/${chapter.id}`}
-                  className="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-6 hover:bg-white/[0.08] transition-all duration-300 hover:scale-[1.02] active:scale-95"
+                  className="group relative overflow-hidden rounded-2xl border border-foreground/5 bg-foreground/5 p-6 hover:bg-foreground/[0.08] transition-all duration-300 hover:scale-[1.02] active:scale-95"
                 >
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-4">
@@ -90,10 +95,10 @@ export default function ChaptersPage() {
                         </span>
                       </div>
                       <div>
-                        <h3 className="text-xl font-bold text-slate-900 dark:text-white group-hover:text-emerald-400 transition-colors">
+                        <h3 className="text-xl font-bold text-foreground group-hover:text-brand-emerald-light dark:group-hover:text-brand-gold transition-colors">
                           {chapter.name_simple}
                         </h3>
-                        <p className="text-sm text-slate-400">{chapter.translated_name.name}</p>
+                        <p className="text-sm text-foreground/40">{chapter.translated_name.name}</p>
                       </div>
                     </div>
                     <div className="text-right">
@@ -103,7 +108,7 @@ export default function ChaptersPage() {
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-4 text-xs text-slate-500 border-t border-white/5 pt-4">
+                  <div className="flex items-center gap-4 text-xs text-foreground/40 border-t border-foreground/5 pt-4">
                     <span className="flex items-center gap-1">
                       <Book className="w-3 h-3" />
                       {chapter.verses_count} Verses
@@ -118,41 +123,46 @@ export default function ChaptersPage() {
                 </Link>
               ))
             ) : (
-              juzs?.map((juz: any) => (
-                <Link
-                  key={juz.id}
-                  href={`/reading?juz=${juz.juz_number}`}
-                  className="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-6 hover:bg-white/[0.08] transition-all duration-300 hover:scale-[1.02] active:scale-95"
-                >
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center gap-4">
-                      <div className="relative w-12 h-12 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform duration-500">
-                        <BookIcon className="absolute inset-0 transition-transform duration-500" />
-                        <span className="relative z-10 font-black text-brand-emerald-light dark:text-brand-gold text-lg">
-                          {juz.juz_number}
-                        </span>
-                      </div>
-                      <div>
-                        <h3 className="text-xl font-bold text-slate-900 dark:text-white group-hover:text-emerald-400 transition-colors">
-                          Juz {juz.juz_number}
-                        </h3>
-                        <p className="text-sm text-slate-400">Boundary Section</p>
+              juzs?.map((juz: any) => {
+                const firstSurahId = Object.keys(juz.verse_mapping).sort((a, b) => Number(a) - Number(b))[0];
+                const startAyah = (juz.verse_mapping[firstSurahId] as string).split('-')[0];
+                
+                return (
+                  <Link
+                    key={juz.id}
+                    href={`/surah/${firstSurahId}?ayah=${startAyah}&juz=${juz.juz_number}`}
+                    className="group relative overflow-hidden rounded-2xl border border-foreground/5 bg-foreground/5 p-6 hover:bg-foreground/[0.08] transition-all duration-300 hover:scale-[1.02] active:scale-95"
+                  >
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center gap-4">
+                        <div className="relative w-12 h-12 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform duration-500">
+                          <BookIcon className="absolute inset-0 transition-transform duration-500" />
+                          <span className="relative z-10 font-black text-brand-emerald-light dark:text-brand-gold text-lg">
+                            {juz.juz_number}
+                          </span>
+                        </div>
+                        <div>
+                          <h3 className="text-xl font-bold text-foreground group-hover:text-brand-emerald-light dark:group-hover:text-brand-gold transition-colors">
+                            Juz {juz.juz_number}
+                          </h3>
+                          <p className="text-sm text-foreground/40">Boundary Section</p>
+                        </div>
                       </div>
                     </div>
-                  </div>
 
-                  <div className="space-y-2 text-xs text-slate-500 border-t border-white/5 pt-4">
-                    {Object.entries(juz.verse_mapping).map(([chapId, range]) => (
-                      <div key={chapId} className="flex items-center justify-between">
-                        <span className="font-bold">Chapter {chapId}</span>
-                        <span className="text-slate-600 font-mono">{range as string}</span>
-                      </div>
-                    ))}
-                  </div>
-                  
-                  <ChevronRight className="absolute bottom-6 right-6 w-5 h-5 text-slate-600 group-hover:text-emerald-400 group-hover:translate-x-1 transition-all" />
-                </Link>
-              ))
+                    <div className="space-y-2 text-xs text-foreground/40 border-t border-foreground/5 pt-4">
+                      {Object.entries(juz.verse_mapping).map(([chapId, range]) => (
+                        <div key={chapId} className="flex items-center justify-between">
+                          <span className="font-bold">Chapter {chapId}</span>
+                          <span className="text-foreground/30 font-mono">{range as string}</span>
+                        </div>
+                      ))}
+                    </div>
+                    
+                    <ChevronRight className="absolute bottom-6 right-6 w-5 h-5 text-slate-600 group-hover:text-emerald-400 group-hover:translate-x-1 transition-all" />
+                  </Link>
+                );
+              })
             )}
           </div>
         )}

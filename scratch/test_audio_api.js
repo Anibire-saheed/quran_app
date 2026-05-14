@@ -3,7 +3,7 @@ const axios = require('axios');
 async function testApi() {
   const reciterId = 7; // Mishary Alafasy
   const chapterId = 1; // Al-Fatiha
-  const url = `https://apis-prelive.quran.foundation/content/api/v4/chapter_recitations/${reciterId}/${chapterId}`;
+  const url = `https://api.quran.com/api/v4/chapter_recitations/${reciterId}/${chapterId}?segments=true`;
   
   console.log(`Testing URL: ${url}`);
   try {

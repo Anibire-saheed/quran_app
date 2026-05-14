@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight, BookOpen, Target, Headphones, Users, Flame } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 import Link from "next/link";
 
 const FEATURES = [
@@ -20,19 +21,11 @@ const ARABIC_VERSES = [
 
 export default function WelcomePage() {
   const router = useRouter();
-  const [name, setName] = useState<string | null>(null);
+  const { user } = useAuth();
   const [verseIndex, setVerseIndex] = useState(0);
   const [phase, setPhase] = useState<"greeting" | "features" | "ready">("greeting");
 
-  useEffect(() => {
-    try {
-      const stored = localStorage.getItem("qf_user");
-      if (stored) {
-        const u = JSON.parse(stored);
-        setName(u.name?.split(" ")[0] ?? null);
-      }
-    } catch { /* ignore */ }
-  }, []);
+  const firstName = user?.name?.split(" ")[0];
 
   // Rotate Arabic verse
   useEffect(() => {
@@ -45,7 +38,11 @@ export default function WelcomePage() {
   // Auto-advance through phases
   useEffect(() => {
     const t1 = setTimeout(() => setPhase("features"), 2200);
-    const t2 = setTimeout(() => setPhase("ready"), 4800);
+    const t2 = setTimeout(() => {
+      setPhase("ready");
+      // Automatic redirect after a brief delay once ready
+      setTimeout(() => router.push("/dashboard"), 1500);
+    }, 4800);
     return () => { clearTimeout(t1); clearTimeout(t2); };
   }, []);
 
@@ -85,9 +82,9 @@ export default function WelcomePage() {
           initial={{ scale: 0, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-          className="mx-auto w-20 h-20 islamic-gradient rounded-3xl flex items-center justify-center shadow-2xl shadow-emerald-900/50 mb-10"
+          className="mx-auto w-24 h-24 mb-10 flex items-center justify-center"
         >
-          <span className="text-4xl font-black italic text-white">Q</span>
+          <img src="/logo.svg" alt="Kashaf Logo" className="w-full h-full object-contain" />
         </motion.div>
 
         {/* Arabic verse rotating */}
@@ -113,18 +110,11 @@ export default function WelcomePage() {
           transition={{ delay: 0.4, duration: 0.8 }}
         >
           <h1 className="text-5xl lg:text-7xl font-black mb-4 leading-tight">
-            {name ? (
-              <>Welcome back,<br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-amber-200 to-amber-400 bg-[length:200%_auto] animate-gradient">
-                  {name}.
-                </span>
-              </>
-            ) : (
-              <>Welcome to<br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-emerald-200 to-emerald-400 bg-[length:200%_auto] animate-gradient">
-                  Quran Majeed.
-                </span>
-              </>
+            As-salamu Alaykum, <br />
+            {firstName && (
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-amber-200 to-amber-400 bg-[length:200%_auto] animate-gradient">
+                {firstName}.
+              </span>
             )}
           </h1>
           <p className="text-white/40 text-lg font-medium mb-12">
@@ -160,37 +150,16 @@ export default function WelcomePage() {
         {/* Streak motivator if available */}
         <WelcomeStreak />
 
-        {/* CTA button — appears in phase 3 */}
+        {/* Auto-redirecting message */}
         <AnimatePresence>
           {phase === "ready" && (
             <motion.div
-              initial={{ opacity: 0, y: 24, scale: 0.95 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-              className="flex flex-col items-center gap-4"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="mt-12 text-amber-400 font-bold tracking-widest text-sm flex items-center justify-center gap-3"
             >
-              <Link
-                href="/dashboard"
-                className="group flex items-center gap-3 bg-white text-black px-12 py-5 rounded-2xl font-black text-xl hover:bg-amber-400 transition-all hover:scale-105 shadow-2xl active:scale-95"
-              >
-                Open Dashboard
-                <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
-              </Link>
-              <p className="text-white/20 text-xs font-semibold tracking-widest uppercase">
-                or continue exploring below
-              </p>
-              <div className="flex items-center gap-6 mt-2">
-                {[
-                  { label: "Chapters", href: "/chapters" },
-                  { label: "Reciters", href: "/reciters" },
-                  { label: "Goals", href: "/goals" },
-                ].map(({ label, href }) => (
-                  <Link key={href} href={href}
-                    className="text-sm text-white/30 hover:text-white transition-colors font-semibold underline-offset-4 hover:underline">
-                    {label}
-                  </Link>
-                ))}
-              </div>
+              <div className="w-4 h-4 border-2 border-amber-400 border-t-transparent rounded-full animate-spin" />
+              TAKING YOU TO DASHBOARD...
             </motion.div>
           )}
         </AnimatePresence>

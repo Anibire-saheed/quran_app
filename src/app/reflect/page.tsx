@@ -360,7 +360,7 @@ export default function ReflectPage() {
       <Sidebar />
       <BottomNav />
 
-      <main className="lg:ml-64 p-6 lg:p-10 max-w-3xl mx-auto">
+      <main className="lg:ml-[280px] p-6 lg:p-10 max-w-3xl mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>

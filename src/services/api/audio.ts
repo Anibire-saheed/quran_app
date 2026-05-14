@@ -5,8 +5,14 @@ import { quranApi } from './axios';
  * Path: /resources/chapter_reciters
  */
 export const fetchChapterReciters = async (language = 'en') => {
-  const { data } = await quranApi.get('/resources/chapter_reciters', { params: { language } });
-  return data.reciters;
+  try {
+    const { data } = await quranApi.get('/resources/recitations', { params: { language } });
+    return data.recitations || data.reciters;
+  } catch (err) {
+    // Fallback for Foundation API path
+    const { data } = await quranApi.get('/resources/chapter_reciters', { params: { language } });
+    return data.reciters || data.recitations;
+  }
 };
 
 /**

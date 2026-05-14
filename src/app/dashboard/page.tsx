@@ -136,7 +136,7 @@ export default function DashboardPage() {
       <Sidebar />
       <BottomNav />
 
-      <main className="lg:ml-64 p-4 lg:p-8 max-w-7xl">
+      <main className="lg:ml-[280px] p-4 lg:p-8 max-w-7xl">
 
         {/* ─── WELCOME HEADER ─── */}
         <motion.div

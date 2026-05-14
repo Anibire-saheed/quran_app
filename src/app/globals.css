@@ -18,43 +18,40 @@
 }
 
 :root {
-  --background: #f8fafc;
-  --foreground: #0f172a;
-  --border: rgba(255, 255, 255, 0.1);
-  --glass-bg: rgba(255, 255, 255, 0.7);
-  --glass-border: rgba(255, 255, 255, 0.3);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root:not(.light) {
-    --background: #020617;
-    --foreground: #f8fafc;
-    --border: rgba(30, 41, 59, 0.5);
-    --glass-bg: rgba(15, 23, 42, 0.7);
-    --glass-border: rgba(30, 41, 59, 0.5);
-  }
+  --background: #fcfaf6; /* Warmer, more premium cream */
+  --foreground: #042f2e; /* Even deeper emerald for better contrast */
+  --border: rgba(4, 47, 46, 0.1);
+  --glass-bg: rgba(255, 255, 255, 0.8);
+  --glass-border: rgba(255, 255, 255, 0.5);
+  
+  --card-bg: #ffffff;
+  --text-muted: #64748b;
+  --accent-gold: #b45309; /* Deeper amber/gold for light mode readability */
+  --accent-emerald: #059669;
+  
+  --hero-gradient: radial-gradient(circle at top right, #fffbeb 0%, #fcfaf6 60%);
 }
 
 html.dark {
   --background: #020617;
   --foreground: #f8fafc;
-  --border: rgba(30, 41, 59, 0.5);
+  --border: rgba(255, 255, 255, 0.05);
   --glass-bg: rgba(15, 23, 42, 0.7);
-  --glass-border: rgba(30, 41, 59, 0.5);
-}
-
-html.light {
-  --background: #ffffff;
-  --foreground: #020617;
-  --border: rgba(2, 6, 23, 0.1);
-  --glass-bg: rgba(255, 255, 255, 0.85);
-  --glass-border: rgba(2, 6, 23, 0.1);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  
+  --card-bg: rgba(30, 41, 59, 0.4);
+  --text-muted: #94a3b8;
+  --accent-gold: #fbbf24;
+  --accent-emerald: #10b981;
+  
+  --hero-gradient: radial-gradient(circle at top right, #064e3b 0%, #020617 60%);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-inter);
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .glass-effect {

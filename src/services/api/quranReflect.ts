@@ -65,7 +65,7 @@ export const deletePost = async (id: number) => {
  * EDIT POST
  */
 export const editPost = async (id: number, update: object) => {
-  const { data } = await quranReflectApi.patch(`/v1/posts/${id}`, update);
+  const { data } = await quranReflectApi.patch(`/v1/posts/${id}`, { post: update });
   return data;
 };
 

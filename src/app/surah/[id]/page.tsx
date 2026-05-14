@@ -7,7 +7,7 @@ import {
   fetchTafsirByAyah, fetchNotesByVerse, addNote, updateNote, deleteNote,
   addUserBookmark, fetchBookmarksInRange,
 } from "@/services/quranService";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import Sidebar from "@/components/layout/Sidebar";
 import BottomNav from "@/components/layout/BottomNav";
 import {
@@ -35,7 +35,7 @@ const SCRIPTS = [
 type PanelMode = "info" | "hadith" | "tafsir" | "note" | null;
 
 interface VerseTranslation { resource_id: number; text: string; }
-interface VerseWord { text_uthmani: string; translation?: { text: string }; }
+interface VerseWord { text_uthmani: string; translation?: { text: string }; position?: number; }
 interface Verse {
   id: string | number;
   verse_number: number;
@@ -119,6 +119,30 @@ export default function SurahDetailPage() {
     
     return () => clearTimeout(timerId);
   }, [currentAyah, page]);
+
+  const searchParams = useSearchParams();
+  const urlAyah = searchParams.get("ayah");
+
+  // Handle Ayah deep-linking from URL
+  useEffect(() => {
+    if (urlAyah && !currentAyah) { // Only if not already playing
+      const ayahNum = parseInt(urlAyah);
+      const perPage = 20;
+      const ayahPage = Math.ceil(ayahNum / perPage);
+      
+      if (ayahPage !== page) {
+        setPage(ayahPage);
+      }
+
+      const timerId = setTimeout(() => {
+        document.getElementById(`ayah-${ayahNum}`)?.scrollIntoView({ 
+          behavior: "smooth", 
+          block: "center" 
+        });
+      }, 600);
+      return () => clearTimeout(timerId);
+    }
+  }, [urlAyah, page, currentAyah]);
   const [script, setScript] = useState("uthmani");
   const [translationId, setTranslationId] = useState("131");
   const [tafsirId, setTafsirId] = useState("169");
@@ -193,7 +217,7 @@ export default function SurahDetailPage() {
   });
 
   const addNoteMutation = useMutation({
-    mutationFn: (body: string) => addNote({ body, saveToQR: false, ranges: [activeAyah as string] }),
+    mutationFn: (body: string) => addNote({ body, saveToQR: false, ...(activeAyah ? { ranges: [activeAyah] } : {}) }),
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["notes-verse", activeAyah] }); setNoteText(""); },
   });
 
@@ -274,7 +298,7 @@ export default function SurahDetailPage() {
       <Sidebar />
       <BottomNav />
 
-      <main className="lg:ml-64 p-6 lg:p-10 max-w-5xl mx-auto">
+      <main className="lg:ml-[280px] p-6 lg:p-10 max-w-5xl mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-6 gap-2 flex-wrap">
           <button type="button" onClick={() => router.back()} aria-label="Go back"

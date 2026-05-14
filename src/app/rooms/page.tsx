@@ -252,7 +252,7 @@ export default function RoomsPage() {
       <div className="min-h-screen bg-background text-foreground pb-40 lg:pb-32">
         <Sidebar />
         <BottomNav />
-        <main className="lg:ml-64 p-6 lg:p-10 flex flex-col items-center justify-center min-h-[70vh]">
+        <main className="lg:ml-[280px] p-6 lg:p-10 flex flex-col items-center justify-center min-h-[70vh]">
           <div className="w-24 h-24 rounded-3xl bg-brand-emerald/10 flex items-center justify-center text-brand-emerald-light mb-8">
             <Users className="w-12 h-12" />
           </div>
@@ -277,7 +277,7 @@ export default function RoomsPage() {
       <Sidebar />
       <BottomNav />
 
-      <main className="lg:ml-64 p-6 lg:p-10 max-w-7xl">
+      <main className="lg:ml-[280px] p-6 lg:p-10 max-w-7xl">
         <header className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
           <div>
             <h1 className="text-4xl font-black mb-2 tracking-tighter">Rooms</h1>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { fetchSurahs, fetchReadingSessions } from "@/services/quranService";
+import { fetchSurahs, fetchReadingSessions, fetchJuzs } from "@/services/quranService";
 import Sidebar from "@/components/layout/Sidebar";
 import BottomNav from "@/components/layout/BottomNav";
 import { BookOpen, Search, ArrowRight, Clock, Sparkles } from "lucide-react";
@@ -12,10 +12,21 @@ import { cn } from "@/utils/cn";
 
 export default function ReadingPage() {
   const [search, setSearch] = useState("");
+  const [viewMode, setViewMode] = useState<'surah' | 'juz'>('surah');
   
   const { data: surahs, isLoading: isLoadingSurahs } = useQuery({
     queryKey: ["surahs"],
     queryFn: () => fetchSurahs(),
+  });
+
+  const { data: juzs, isLoading: isLoadingJuzs } = useQuery({
+    queryKey: ["juzs"],
+    queryFn: async () => {
+      const data = await fetchJuzs();
+      const uniqueJuzs = Array.from(new Map(data.map((j: any) => [j.juz_number, j])).values());
+      return uniqueJuzs;
+    },
+    enabled: viewMode === 'juz',
   });
 
   const { data: sessions, isLoading: isLoadingSessions } = useQuery({
@@ -35,13 +46,40 @@ export default function ReadingPage() {
       <Sidebar />
       <BottomNav />
 
-      <main className="lg:ml-64 p-6 lg:p-10">
-        <div className="mb-10">
-          <h2 className="text-3xl font-black mb-2 flex items-center gap-3">
-            <BookOpen className="w-8 h-8 text-brand-emerald-light" />
-            Reading Room
-          </h2>
-          <p className="text-slate-400">Select a Surah to begin your immersive reading experience.</p>
+      <main className="lg:ml-[280px] p-6 lg:p-10">
+        <div className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
+          <div>
+            <h2 className="text-3xl font-black mb-2 flex items-center gap-3">
+              <BookOpen className="w-8 h-8 text-brand-emerald-light" />
+              Reading Room
+            </h2>
+            <p className="text-slate-400">Select a {viewMode === 'surah' ? 'Surah' : 'Juz'} to begin your immersive reading experience.</p>
+          </div>
+
+          <div className="flex bg-slate-100 dark:bg-white/5 p-1 rounded-2xl border border-slate-200 dark:border-white/10 w-fit">
+            <button
+              onClick={() => setViewMode('surah')}
+              className={cn(
+                "px-6 py-2.5 rounded-xl text-sm font-black transition-all duration-300",
+                viewMode === 'surah' 
+                  ? "bg-white dark:bg-white/10 text-brand-emerald dark:text-brand-gold shadow-lg shadow-black/5" 
+                  : "text-foreground/40 hover:text-foreground"
+              )}
+            >
+              Surah
+            </button>
+            <button
+              onClick={() => setViewMode('juz')}
+              className={cn(
+                "px-6 py-2.5 rounded-xl text-sm font-black transition-all duration-300",
+                viewMode === 'juz' 
+                  ? "bg-white dark:bg-white/10 text-brand-emerald dark:text-brand-gold shadow-lg shadow-black/5" 
+                  : "text-foreground/40 hover:text-foreground"
+              )}
+            >
+              Juz
+            </button>
+          </div>
         </div>
 
         {/* Continue Reading Card */}
@@ -86,7 +124,7 @@ export default function ReadingPage() {
           />
         </div>
 
-        {(isLoadingSurahs || isLoadingSessions) ? (
+        {(isLoadingSurahs || isLoadingSessions || (viewMode === 'juz' && isLoadingJuzs)) ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {[...Array(12)].map((_, i) => (
               <div key={i} className="h-16 rounded-xl bg-white/5 animate-pulse"></div>
@@ -94,27 +132,55 @@ export default function ReadingPage() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filteredSurahs?.map((surah: any) => (
-              <Link 
-                key={surah.id}
-                href={`/surah/${surah.id}`}
-                className="flex items-center justify-between p-4 rounded-2xl bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 hover:border-brand-emerald-light/30 hover:bg-black/10 dark:hover:bg-white/10 transition-all group"
-              >
-                <div className="flex items-center gap-4">
-                  <div className="relative w-12 h-12 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform duration-500">
-                    <BookIcon className="absolute inset-0 transition-transform duration-500" />
-                    <span className="relative z-10 font-black text-slate-500 dark:text-slate-400 group-hover:text-brand-emerald-light transition-colors text-sm">
-                      {surah.id}
-                    </span>
+            {viewMode === 'surah' ? (
+              filteredSurahs?.map((surah: any) => (
+                <Link 
+                  key={surah.id}
+                  href={`/surah/${surah.id}`}
+                  className="flex items-center justify-between p-4 rounded-2xl bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 hover:border-brand-emerald-light/30 hover:bg-black/10 dark:hover:bg-white/10 transition-all group"
+                >
+                  <div className="flex items-center gap-4">
+                    <div className="relative w-12 h-12 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform duration-500">
+                      <BookIcon className="absolute inset-0 transition-transform duration-500" />
+                      <span className="relative z-10 font-black text-slate-500 dark:text-slate-400 group-hover:text-brand-emerald-light transition-colors text-sm">
+                        {surah.id}
+                      </span>
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-sm text-foreground">{surah.name_simple}</h4>
+                      <p className="text-[10px] text-slate-500 uppercase tracking-widest">{surah.verses_count} Ayahs</p>
+                    </div>
                   </div>
-                  <div>
-                    <h4 className="font-bold text-sm text-foreground">{surah.name_simple}</h4>
-                    <p className="text-[10px] text-slate-500 uppercase tracking-widest">{surah.verses_count} Ayahs</p>
-                  </div>
-                </div>
-                <span className="arabic-text text-xl text-slate-700 dark:text-slate-300 group-hover:text-brand-gold transition-colors">{surah.name_arabic}</span>
-              </Link>
-            ))}
+                  <span className="arabic-text text-xl text-slate-700 dark:text-slate-300 group-hover:text-brand-gold transition-colors">{surah.name_arabic}</span>
+                </Link>
+              ))
+            ) : (
+              juzs?.map((juz: any) => {
+                const firstSurahId = Object.keys(juz.verse_mapping).sort((a, b) => Number(a) - Number(b))[0];
+                const startAyah = (juz.verse_mapping[firstSurahId] as string).split('-')[0];
+                return (
+                  <Link 
+                    key={juz.id}
+                    href={`/surah/${firstSurahId}?ayah=${startAyah}&juz=${juz.juz_number}`}
+                    className="flex items-center justify-between p-4 rounded-2xl bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 hover:border-brand-emerald-light/30 hover:bg-black/10 dark:hover:bg-white/10 transition-all group"
+                  >
+                    <div className="flex items-center gap-4">
+                      <div className="relative w-12 h-12 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform duration-500">
+                        <BookIcon className="absolute inset-0 transition-transform duration-500" />
+                        <span className="relative z-10 font-black text-slate-500 dark:text-slate-400 group-hover:text-brand-emerald-light transition-colors text-sm">
+                          {juz.juz_number}
+                        </span>
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-sm text-foreground">Juz {juz.juz_number}</h4>
+                        <p className="text-[10px] text-slate-500 uppercase tracking-widest">Section {juz.juz_number}</p>
+                      </div>
+                    </div>
+                    <ChevronRight className="w-4 h-4 text-slate-500 group-hover:translate-x-1 transition-transform" />
+                  </Link>
+                );
+              })
+            )}
           </div>
         )}
       </main>

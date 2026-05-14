@@ -60,7 +60,7 @@ export default function SettingsPage() {
       <Sidebar />
       <BottomNav />
 
-      <main className="lg:ml-64 p-6 lg:p-10 max-w-4xl mx-auto">
+      <main className="lg:ml-[280px] p-6 lg:p-10 max-w-4xl mx-auto">
         <div className="mb-10">
           <h2 className="text-3xl font-black mb-2 flex items-center gap-3">
             <Settings className="w-8 h-8 text-slate-400" />

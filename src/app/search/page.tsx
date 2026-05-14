@@ -127,7 +127,7 @@ export default function SearchPage() {
       <Sidebar />
       <BottomNav />
 
-      <main className="lg:ml-64 p-6 lg:p-10">
+      <main className="lg:ml-[280px] p-6 lg:p-10">
         <div className="max-w-3xl mx-auto">
 
           {/* ── Header ── */}

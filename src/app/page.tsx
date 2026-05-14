@@ -4,7 +4,8 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import {
   MapPin, Sparkles, ArrowRight, Play, BookOpen, Heart, Globe,
-  Shield, Zap, Users, Star, ChevronDown, Moon, Menu, X,
+  Shield, Zap, Users, Star, ChevronDown, Moon, Sun, Menu, X,
+  Sunrise, SunMedium, Sunset, CloudMoon,
 } from "lucide-react";
 import { cn } from "@/utils/cn";
 import {
@@ -12,6 +13,7 @@ import {
   AnimatePresence, type Variants,
 } from "framer-motion";
 import { useAuth } from "@/hooks/useAuth";
+import { useThemeStore } from "@/store/useThemeStore";
 
 interface PrayerTimes {
   Fajr: string; Sunrise: string; Dhuhr: string;
@@ -69,7 +71,9 @@ const fadeUp: Variants = {
 };
 
 export default function LandingPage() {
+  const [mounted, setMounted] = useState(false);
   const { login, isAuthenticated } = useAuth();
+  const { mode, setMode } = useThemeStore();
   const [prayerTimes, setPrayerTimes] = useState<PrayerTimes | null>(null);
   const [city] = useState("Lagos");
   const [hijriDate, setHijriDate] = useState("");
@@ -78,6 +82,12 @@ export default function LandingPage() {
   const { scrollYProgress } = useScroll();
   const heroY = useTransform(scrollYProgress, [0, 0.4], [0, -120]);
   const heroOpacity = useTransform(scrollYProgress, [0, 0.3], [1, 0]);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const toggleTheme = () => setMode(mode === 'dark' ? 'light' : 'dark');
 
   useEffect(() => {
     const t = setInterval(() => setCurrentTime(new Date()), 1000);
@@ -95,45 +105,54 @@ export default function LandingPage() {
       .catch(() => {});
   }, [city]);
 
+  if (!mounted) return <div className="min-h-screen bg-background" />;
+
   return (
-    <div className="bg-[#020617] text-white selection:bg-amber-400 selection:text-black overflow-x-hidden">
+    <div className="min-h-screen selection:bg-brand-emerald-light/30 selection:text-white overflow-x-hidden bg-background text-foreground">
 
       {/* ─── NAVBAR ─── */}
       <motion.nav
-        initial={{ y: -20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.6 }}
-        className="fixed top-0 inset-x-0 z-50 flex items-center justify-between px-6 py-4 lg:px-16 backdrop-blur-xl bg-black/30 border-b border-white/5"
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="fixed top-0 inset-x-0 z-50 flex items-center justify-between px-6 py-4 lg:px-16 backdrop-blur-xl bg-background/60 dark:bg-black/30 border-b border-foreground/5 dark:border-white/5"
       >
-        <Link href="/" className="flex items-center gap-3 group">
+        <Link href="/" className="flex items-center justify-center group">
           <motion.div
-            whileHover={{ rotate: 15, scale: 1.1 }}
+            whileHover={{ rotate: 5, scale: 1.1 }}
             transition={{ type: "spring", stiffness: 300 }}
-            className="w-10 h-10 islamic-gradient rounded-xl flex items-center justify-center shadow-lg shadow-emerald-900/40"
+            className="w-14 h-14 relative"
           >
-            <span className="text-xl font-black italic">Q</span>
+            <img src="/logo.svg" alt="Kashaf Logo" className="w-full h-full object-contain" />
           </motion.div>
-          <span className="text-lg font-black tracking-tight">Quran Majeed</span>
         </Link>
 
-        <div className="hidden lg:flex items-center gap-10 text-sm font-semibold text-white/60">
-          <Link href="#features" className="hover:text-white transition-colors">Features</Link>
-          <Link href="#community" className="hover:text-white transition-colors">Community</Link>
-          <Link href="#prayer" className="hover:text-white transition-colors">Prayer Times</Link>
+        <div className="hidden lg:flex items-center gap-10 text-sm font-bold text-foreground/60">
+          <Link href="#features" className="hover:text-foreground transition-colors">Features</Link>
+          <Link href="#community" className="hover:text-foreground transition-colors">Community</Link>
+          <Link href="/prayer-times" className="hover:text-foreground transition-colors">Prayer Times</Link>
         </div>
 
         <div className="hidden lg:flex items-center gap-4">
+          <motion.button
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+            onClick={toggleTheme}
+            className="p-2.5 rounded-full bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-foreground/70 hover:text-foreground transition-colors"
+          >
+            {mode === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+          </motion.button>
+
           {isAuthenticated ? (
-            <Link href="/chapters" className="px-6 py-2.5 rounded-full bg-white text-black font-bold text-sm hover:bg-amber-400 transition-colors">
+            <Link href="/chapters" className="px-6 py-2.5 rounded-full bg-foreground text-background font-bold text-sm hover:bg-brand-emerald transition-all shadow-lg active:scale-95">
               Dashboard
             </Link>
           ) : (
             <>
-              <button type="button" onClick={login} className="text-sm font-semibold text-white/60 hover:text-white transition-colors">
+              <button type="button" onClick={login} className="text-sm font-semibold text-foreground/60 hover:text-foreground transition-colors">
                 Sign In
               </button>
               <button type="button" onClick={login}
-                className="px-6 py-2.5 rounded-full bg-white text-black font-bold text-sm hover:bg-amber-400 transition-colors">
+                className="px-6 py-2.5 rounded-full bg-foreground text-background font-bold text-sm hover:bg-brand-emerald transition-all shadow-lg active:scale-95">
                 Get Started
               </button>
             </>
@@ -152,7 +171,7 @@ export default function LandingPage() {
           <motion.div initial={{ opacity: 0, y: -16 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -16 }}
             className="fixed top-16 inset-x-0 z-40 glass-effect border-b border-white/10 p-6 flex flex-col gap-4 lg:hidden">
             <Link href="#features" onClick={() => setMenuOpen(false)} className="font-semibold hover:text-amber-400 transition-colors">Features</Link>
-            <Link href="#prayer" onClick={() => setMenuOpen(false)} className="font-semibold hover:text-amber-400 transition-colors">Prayer Times</Link>
+            <Link href="/prayer-times" onClick={() => setMenuOpen(false)} className="font-semibold hover:text-amber-400 transition-colors">Prayer Times</Link>
             {isAuthenticated ? (
               <Link href="/chapters" onClick={() => setMenuOpen(false)}
                 className="px-6 py-3 rounded-2xl islamic-gradient text-white font-bold text-sm w-fit text-center">
@@ -170,18 +189,19 @@ export default function LandingPage() {
 
       {/* ─── HERO ─── */}
       <section className="relative min-h-screen flex flex-col items-center justify-center pt-20 overflow-hidden">
-        {/* Parallax mosque background */}
+        {/* Dynamic background */}
         <motion.div
           style={{ y: heroY }}
-          className="absolute inset-0 z-0 bg-cover bg-center bg-[url('/mosque-bg.png')]"
+          className="absolute inset-0 z-0 bg-cover bg-center transition-all duration-1000 bg-[url('/mosque-bg.png')] opacity-55 dark:opacity-60"
         >
-          <div className="absolute inset-0 bg-linear-to-b from-black/70 via-black/50 to-[#020617]" />
+          <div className="absolute inset-0 bg-background/10 backdrop-blur-[0.5px]" />
+          <div className="absolute inset-0 bg-linear-to-b from-transparent via-background/20 to-background" />
         </motion.div>
 
         {/* Animated glow orbs */}
         <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-1/4 left-1/4 w-125 h-125 bg-emerald-600/10 rounded-full blur-[120px] animate-float" />
-          <div className="absolute bottom-1/3 right-1/4 w-100 h-100 bg-amber-500/8 rounded-full blur-[100px] animate-float-reverse" />
+          <div className="absolute top-1/4 left-1/4 w-125 h-125 bg-brand-emerald-light/10 dark:bg-emerald-600/10 rounded-full blur-[120px] animate-float" />
+          <div className="absolute bottom-1/3 right-1/4 w-100 h-100 bg-brand-gold/10 dark:bg-amber-500/8 rounded-full blur-[100px] animate-float-reverse" />
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-150 h-150 bg-brand-emerald/5 rounded-full blur-[160px]" />
         </div>
 
@@ -207,7 +227,7 @@ export default function LandingPage() {
             transition={{ duration: 1.2, ease: "easeOut" }}
             className="mb-8"
           >
-            <p className="arabic-text text-3xl lg:text-5xl text-amber-300/90 font-medium tracking-wide drop-shadow-2xl">
+            <p className="arabic-text text-4xl lg:text-7xl text-brand-gold-dark dark:text-amber-300 font-medium tracking-wide drop-shadow-[0_4px_12px_rgba(180,83,9,0.15)] dark:drop-shadow-2xl">
               بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ
             </p>
           </motion.div>
@@ -217,10 +237,10 @@ export default function LandingPage() {
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4, duration: 0.6 }}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-amber-400 text-[10px] font-black tracking-[0.4em] uppercase mb-8 backdrop-blur-md"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-200/50 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-brand-gold-dark dark:text-amber-400 text-[10px] font-black tracking-[0.4em] uppercase mb-8 backdrop-blur-md"
           >
             <Star className="w-3 h-3 fill-current" />
-            Redefining Spiritual Connection
+            Redefining Spiritual Excellence
           </motion.div>
 
           {/* Headline */}
@@ -228,10 +248,10 @@ export default function LandingPage() {
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.6, duration: 0.9 }}
-            className="text-6xl lg:text-[110px] font-black mb-6 leading-[0.85] tracking-tighter"
+            className="text-6xl lg:text-[110px] font-black mb-6 leading-[0.85] tracking-tighter text-brand-emerald dark:text-white"
           >
             Come Close<br />
-            <span className="text-transparent bg-clip-text bg-linear-to-r from-amber-400 via-amber-200 to-amber-400 bg-size-[200%_auto] animate-gradient">
+            <span className="text-transparent bg-clip-text bg-linear-to-r from-brand-gold-dark via-brand-gold to-brand-gold-dark dark:from-amber-400 dark:via-amber-200 dark:to-amber-400 bg-size-[200%_auto] animate-gradient">
               to Allah.
             </span>
           </motion.h1>
@@ -240,10 +260,10 @@ export default function LandingPage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 1, duration: 0.8 }}
-            className="text-lg lg:text-xl text-white/50 max-w-xl mx-auto mb-12 leading-relaxed font-medium"
+            className="text-lg lg:text-xl text-foreground/60 max-w-xl mx-auto mb-12 leading-relaxed font-medium"
           >
             Experience the Noble Quran with premium audio, beautiful typography,
-            and tools crafted for the modern Muslim.
+            and tools crafted for the modern seeker.
           </motion.p>
 
           {/* CTAs */}
@@ -255,13 +275,13 @@ export default function LandingPage() {
           >
             {isAuthenticated ? (
               <Link href="/chapters"
-                className="group flex items-center gap-3 bg-white text-black px-10 py-5 rounded-2xl font-black text-lg hover:bg-amber-400 transition-all hover:scale-105 shadow-2xl active:scale-95">
+                className="group flex items-center gap-3 bg-brand-emerald dark:bg-white text-white dark:text-black px-10 py-5 rounded-2xl font-black text-lg hover:bg-brand-emerald-light dark:hover:bg-amber-400 transition-all hover:scale-105 shadow-2xl active:scale-95">
                 Go to Dashboard
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1.5 transition-transform" />
               </Link>
             ) : (
               <button type="button" onClick={login}
-                className="group flex items-center gap-3 bg-white text-black px-10 py-5 rounded-2xl font-black text-lg hover:bg-amber-400 transition-all hover:scale-105 shadow-2xl active:scale-95">
+                className="group flex items-center gap-3 bg-brand-emerald dark:bg-white text-white dark:text-black px-10 py-5 rounded-2xl font-black text-lg hover:bg-brand-emerald-light dark:hover:bg-amber-400 transition-all hover:scale-105 shadow-2xl active:scale-95">
                 Start Reading Free
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1.5 transition-transform" />
               </button>
@@ -276,70 +296,97 @@ export default function LandingPage() {
           transition={{ delay: 2, duration: 1 }}
           className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-white/30 z-10"
         >
-          <span className="text-[10px] tracking-widest uppercase">Scroll</span>
+          <span className="text-[10px] tracking-widest uppercase text-foreground/40">Scroll</span>
           <motion.div animate={{ y: [0, 8, 0] }} transition={{ duration: 1.5, repeat: Infinity }}>
-            <ChevronDown className="w-5 h-5" />
+            <ChevronDown className="w-5 h-5 text-foreground/40" />
           </motion.div>
         </motion.div>
       </section>
 
       {/* ─── PRAYER TIMES ─── */}
-      <section id="prayer" className="py-20 px-6 lg:px-16 max-w-7xl mx-auto">
+      <section id="prayer" className="py-24 px-6 lg:px-16 max-w-7xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.7 }}
-          className="glass-effect rounded-3xl overflow-hidden border-white/5 shadow-2xl"
+          transition={{ duration: 0.8 }}
+          className="relative glass-effect rounded-[48px] overflow-hidden border-white/5 shadow-2xl group"
         >
-          <div className="bg-white/5 p-6 lg:p-10 flex flex-col lg:flex-row items-center justify-between gap-6 border-b border-white/5">
-            <div className="flex flex-wrap items-center gap-8">
-              <div>
-                <p className="text-[10px] font-black text-white/30 uppercase tracking-widest mb-1">Location</p>
-                <div className="flex items-center gap-2 text-base font-bold">
-                  <MapPin className="w-4 h-4 text-amber-400" /> {city}, Nigeria
+          {/* Header Link */}
+          <Link href="/prayer-times" className="absolute inset-0 z-20" aria-label="View all prayer times" />
+          
+          <div className="bg-white/[0.03] p-8 lg:p-12 flex flex-col lg:flex-row items-center justify-between gap-8 border-b border-white/5 relative z-10">
+            <div className="flex flex-wrap items-center gap-10">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-2xl bg-brand-gold/10 flex items-center justify-center border border-brand-gold/20">
+                  <MapPin className="w-6 h-6 text-brand-gold" />
+                </div>
+                <div>
+                  <p className="text-[10px] font-black text-foreground/30 uppercase tracking-[0.3em] mb-1">Location</p>
+                  <p className="text-xl font-black">{city}, Nigeria</p>
                 </div>
               </div>
-              <div className="w-px h-10 bg-white/10 hidden lg:block" />
+              
+              <div className="hidden lg:block w-px h-10 bg-white/10" />
+              
               <div>
-                <p className="text-[10px] font-black text-white/30 uppercase tracking-widest mb-1">Current Time</p>
-                <div className="text-3xl font-black tabular-nums font-mono">
+                <p className="text-[10px] font-black text-foreground/30 uppercase tracking-[0.3em] mb-1">Current Time</p>
+                <div className="text-4xl font-black tabular-nums tracking-tight">
                   {currentTime ? currentTime.toLocaleTimeString("en-US", { hour12: false }) : "--:--:--"}
                 </div>
               </div>
+
               {hijriDate && (
                 <>
-                  <div className="w-px h-10 bg-white/10 hidden lg:block" />
+                  <div className="hidden lg:block w-px h-10 bg-white/10" />
                   <div>
-                    <p className="text-[10px] font-black text-white/30 uppercase tracking-widest mb-1">Hijri Date</p>
-                    <div className="flex items-center gap-2 font-bold">
-                      <Moon className="w-4 h-4 text-amber-400" /> {hijriDate}
+                    <p className="text-[10px] font-black text-foreground/30 uppercase tracking-[0.3em] mb-1">Hijri Date</p>
+                    <div className="flex items-center gap-3 font-bold text-lg">
+                      <Moon className="w-5 h-5 text-brand-gold fill-brand-gold/20" /> {hijriDate}
                     </div>
                   </div>
                 </>
               )}
             </div>
-            <div className="flex items-center gap-3 bg-emerald-500/10 border border-emerald-500/20 px-6 py-3 rounded-2xl">
-              <span className="w-2.5 h-2.5 bg-emerald-400 rounded-full animate-ping" />
-              <span className="text-sm font-bold text-emerald-400 uppercase tracking-widest">Live Times</span>
+            
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-3 bg-emerald-500/10 border border-emerald-500/20 px-6 py-3 rounded-2xl">
+                <span className="w-2.5 h-2.5 bg-emerald-400 rounded-full animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.8)]" />
+                <span className="text-[10px] font-black text-emerald-400 uppercase tracking-widest">Live Times</span>
+              </div>
+              <div className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center group-hover:bg-brand-gold group-hover:text-black transition-all">
+                <ArrowRight className="w-6 h-6" />
+              </div>
             </div>
           </div>
-          <div className="grid grid-cols-3 lg:grid-cols-6 divide-x divide-white/5">
+
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 relative z-10">
             {prayerTimes
               ? Object.entries(prayerTimes)
                   .filter(([k]) => ["Fajr", "Sunrise", "Dhuhr", "Asr", "Maghrib", "Isha"].includes(k))
-                  .map(([name, time]) => (
-                    <motion.div key={name}
-                      whileHover={{ backgroundColor: "rgba(255,255,255,0.05)" }}
-                      className="p-6 lg:p-8 flex flex-col items-center cursor-default transition-colors">
-                      <span className="text-[10px] font-black text-white/30 mb-2 uppercase tracking-widest">{name}</span>
-                      <span className="text-xl font-black tabular-nums">{time}</span>
-                    </motion.div>
+                  .map(([name, time], idx) => (
+                    <div key={name} className="p-8 lg:p-12 flex flex-col items-center border-r border-b border-white/5 last:border-r-0 hover:bg-white/[0.02] transition-colors relative group/item">
+                      <div className="mb-8 relative">
+                        {name === "Fajr" && <Moon className="w-8 h-8 text-blue-400" />}
+                        {name === "Sunrise" && <Sunrise className="w-8 h-8 text-amber-400" />}
+                        {name === "Dhuhr" && <Sun className="w-8 h-8 text-amber-500" />}
+                        {name === "Asr" && <SunMedium className="w-8 h-8 text-orange-400" />}
+                        {name === "Maghrib" && <Sunset className="w-8 h-8 text-rose-400" />}
+                        {name === "Isha" && <CloudMoon className="w-8 h-8 text-indigo-400" />}
+                        <div className="absolute inset-0 blur-xl opacity-20 bg-brand-gold -z-10" />
+                      </div>
+                      <span className="text-[10px] font-black text-foreground/30 mb-2 uppercase tracking-[0.2em]">{name}</span>
+                      <span className="text-2xl lg:text-3xl font-black tabular-nums text-brand-gold tracking-tight">{time}</span>
+                      
+                      {/* Vertical line indicator */}
+                      <div className="absolute right-0 top-1/4 bottom-1/4 w-px bg-linear-to-b from-transparent via-brand-gold/20 to-transparent opacity-0 group-hover/item:opacity-100 transition-opacity" />
+                    </div>
                   ))
               : Array(6).fill(null).map((_, i) => (
-                  <div key={i} className="p-8 flex flex-col items-center gap-2">
-                    <div className="h-3 w-10 bg-white/10 rounded animate-pulse" />
-                    <div className="h-6 w-16 bg-white/10 rounded animate-pulse" />
+                  <div key={i} className="p-12 flex flex-col items-center gap-4 border-r border-white/5 last:border-r-0">
+                    <div className="w-8 h-8 bg-white/5 rounded-full animate-pulse" />
+                    <div className="h-3 w-10 bg-white/5 rounded animate-pulse" />
+                    <div className="h-8 w-20 bg-white/5 rounded animate-pulse" />
                   </div>
                 ))}
           </div>
@@ -357,10 +404,10 @@ export default function LandingPage() {
         >
           {STATS.map(({ value, suffix, label }) => (
             <motion.div key={label} variants={fadeUp}>
-              <p className="text-5xl lg:text-6xl font-black text-amber-400 mb-1">
+              <p className="text-5xl lg:text-6xl font-black text-brand-gold-dark dark:text-amber-400 mb-1">
                 <AnimatedCounter to={value} suffix={suffix} />
               </p>
-              <p className="text-white/40 font-semibold text-sm uppercase tracking-widest">{label}</p>
+              <p className="text-foreground/40 font-semibold text-sm uppercase tracking-widest">{label}</p>
             </motion.div>
           ))}
         </motion.div>
@@ -375,11 +422,11 @@ export default function LandingPage() {
           viewport={{ once: true, margin: "-80px" }}
           className="text-center mb-20"
         >
-          <motion.p variants={fadeUp} className="text-amber-400 text-xs font-black tracking-[0.4em] uppercase mb-4">Everything You Need</motion.p>
+          <motion.p variants={fadeUp} className="text-brand-gold-dark dark:text-amber-400 text-xs font-black tracking-[0.4em] uppercase mb-4">Everything You Need</motion.p>
           <motion.h2 variants={fadeUp} className="text-4xl lg:text-7xl font-black mb-6">
             Built for the <span className="text-transparent bg-clip-text islamic-gradient">Modern Soul</span>
           </motion.h2>
-          <motion.p variants={fadeUp} className="text-white/40 max-w-2xl mx-auto text-lg">
+          <motion.p variants={fadeUp} className="text-foreground/60 max-w-2xl mx-auto text-lg">
             Every detail crafted for a distraction-free, immersive spiritual experience.
           </motion.p>
         </motion.div>
@@ -406,16 +453,16 @@ export default function LandingPage() {
                 <f.icon className="w-7 h-7 text-white" />
               </div>
               <h3 className="text-xl font-black mb-3">{f.title}</h3>
-              <p className="text-white/40 leading-relaxed text-sm">{f.desc}</p>
+              <p className="text-foreground/50 leading-relaxed text-sm">{f.desc}</p>
             </motion.div>
           ))}
         </motion.div>
       </section>
 
       {/* ─── VERSE SECTION ─── */}
-      <section className="py-24 px-6 relative overflow-hidden">
-        <div className="absolute inset-0 bg-linear-to-r from-emerald-950/40 to-transparent" />
-        <div className="absolute top-1/2 left-0 -translate-y-1/2 w-150 h-150 bg-emerald-600/5 rounded-full blur-[120px]" />
+      <section className="py-24 px-6 relative overflow-hidden bg-foreground/[0.02] dark:bg-transparent">
+        <div className="absolute inset-0 bg-linear-to-r from-brand-gold/5 via-transparent to-brand-emerald/5 dark:from-emerald-950/40 dark:to-transparent" />
+        <div className="absolute top-1/2 left-0 -translate-y-1/2 w-150 h-150 bg-brand-emerald/5 rounded-full blur-[120px]" />
         <motion.div
           initial={{ opacity: 0, scale: 0.96 }}
           whileInView={{ opacity: 1, scale: 1 }}
@@ -423,13 +470,13 @@ export default function LandingPage() {
           transition={{ duration: 0.9 }}
           className="relative max-w-4xl mx-auto text-center"
         >
-          <p className="text-amber-400 text-[10px] font-black tracking-[0.4em] uppercase mb-10">Verse of the Day</p>
+          <p className="text-brand-gold-dark dark:text-amber-400 text-[10px] font-black tracking-[0.4em] uppercase mb-10">Verse of the Day</p>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.2, duration: 1 }}
-            className="arabic-text text-4xl lg:text-6xl text-white/90 leading-loose mb-10 font-medium"
+            className="arabic-text text-4xl lg:text-6xl text-foreground font-medium"
           >
             {VERSE.arabic}
           </motion.p>
@@ -445,11 +492,11 @@ export default function LandingPage() {
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
             transition={{ delay: 0.7, duration: 0.8 }}
-            className="text-xl lg:text-2xl text-white/60 italic mb-4 font-medium"
+            className="text-xl lg:text-2xl text-foreground/70 italic mb-4 font-medium"
           >
             &ldquo;{VERSE.translation}&rdquo;
           </motion.p>
-          <p className="text-white/30 text-sm font-semibold tracking-wider">{VERSE.ref}</p>
+          <p className="text-foreground/30 text-sm font-semibold tracking-wider">{VERSE.ref}</p>
         </motion.div>
       </section>
 
@@ -463,18 +510,18 @@ export default function LandingPage() {
               <p className="text-emerald-400 text-[10px] font-black tracking-[0.4em] uppercase mb-6">Immersive Audio</p>
               <h3 className="text-4xl lg:text-6xl font-black mb-8 leading-tight">
                 Listen to the<br />
-                <span className="text-emerald-400">Divine Melody.</span>
+                <span className="text-emerald-600 dark:text-emerald-400">Divine Melody.</span>
               </h3>
-              <p className="text-white/50 text-lg mb-10 leading-relaxed">
+              <p className="text-foreground/60 text-lg mb-10 leading-relaxed">
                 Our persistent audio player follows you as you browse — never missing a beat.
               </p>
               <div className="space-y-4">
                 {["Gapless Surah transitions", "128 kbps crystal-clear audio", "Choose from 100+ Reciters"].map((item) => (
                   <div key={item} className="flex items-center gap-4">
-                    <div className="w-6 h-6 rounded-full bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center shrink-0">
-                      <Zap className="w-3 h-3 text-emerald-400 fill-current" />
+                    <div className="w-6 h-6 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center shrink-0">
+                      <Zap className="w-3 h-3 text-emerald-600 dark:text-emerald-400 fill-current" />
                     </div>
-                    <span className="font-semibold text-white/80">{item}</span>
+                    <span className="font-semibold text-foreground/80">{item}</span>
                   </div>
                 ))}
               </div>
@@ -524,7 +571,7 @@ export default function LandingPage() {
                     className="h-full bg-emerald-400 rounded-full"
                   />
                 </div>
-                <div className="flex items-center justify-between text-[10px] text-white/30 font-mono">
+                <div className="flex items-center justify-between text-[10px] text-foreground/30 font-mono">
                   <span>3:24</span><span>11:45</span>
                 </div>
                 <div className="flex items-center justify-center gap-8 mt-6">
@@ -554,21 +601,21 @@ export default function LandingPage() {
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
           >
-            <p className="text-amber-400 text-[10px] font-black tracking-[0.4em] uppercase mb-6">Community</p>
+            <p className="text-brand-gold-dark dark:text-amber-400 text-[10px] font-black tracking-[0.4em] uppercase mb-6">Community</p>
             <h3 className="text-4xl lg:text-6xl font-black mb-8 leading-tight">
               Connect with<br />
-              <span className="text-transparent bg-clip-text bg-linear-to-r from-amber-400 to-amber-200">Muslims Worldwide.</span>
+              <span className="text-transparent bg-clip-text bg-linear-to-r from-brand-gold-dark via-brand-gold to-brand-gold-dark dark:from-amber-400 dark:to-amber-200">Muslims Worldwide.</span>
             </h3>
-            <p className="text-white/50 text-lg mb-10 leading-relaxed">
+            <p className="text-foreground/50 text-lg mb-10 leading-relaxed">
               Join reading rooms, share reflections, set goals together, and grow spiritually as a community.
             </p>
             <div className="flex flex-wrap gap-4">
               <button type="button" onClick={login}
-                className="flex items-center gap-2 px-7 py-4 rounded-2xl bg-amber-400 text-black font-black hover:bg-amber-300 transition-colors">
+                className="flex items-center gap-2 px-7 py-4 rounded-2xl bg-brand-gold-dark dark:bg-amber-400 text-white dark:text-black font-black hover:bg-brand-gold transition-colors shadow-lg shadow-amber-500/20">
                 <Users className="w-5 h-5" /> Join a Room
               </button>
               <button type="button" onClick={login}
-                className="flex items-center gap-2 px-7 py-4 rounded-2xl bg-white/5 border border-white/10 font-bold hover:bg-white/10 transition-colors">
+                className="flex items-center gap-2 px-7 py-4 rounded-2xl bg-foreground/5 border border-foreground/10 font-bold hover:bg-foreground/10 transition-colors">
                 <Sparkles className="w-5 h-5" /> Explore Reflections
               </button>
             </div>
@@ -592,7 +639,7 @@ export default function LandingPage() {
                 className="glass-effect rounded-2xl p-6 border-white/5 text-center cursor-default">
                 <item.icon className={cn("w-7 h-7 mx-auto mb-3", item.color)} />
                 <p className="text-3xl font-black mb-1">{item.value}</p>
-                <p className="text-white/40 text-xs font-semibold">{item.label}</p>
+                <p className="text-foreground/40 text-xs font-semibold">{item.label}</p>
               </motion.div>
             ))}
           </motion.div>
@@ -630,65 +677,64 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-14 mb-16">
             <div>
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-10 h-10 islamic-gradient rounded-xl flex items-center justify-center">
-                  <span className="text-xl font-black italic">Q</span>
+              <div className="flex items-center justify-center mb-6">
+                <div className="w-14 h-14 relative">
+                  <img src="/logo.svg" alt="Kashaf Logo" className="w-full h-full object-contain" />
                 </div>
-                <h2 className="text-lg font-black uppercase">Quran Majeed</h2>
               </div>
-              <p className="text-white/30 leading-relaxed text-sm mb-6">
+              <p className="text-foreground/30 leading-relaxed text-sm mb-6">
                 Bringing the light of the Quran to your digital world with excellence and beauty.
               </p>
               <div className="flex gap-3">
                 {[1,2,3,4].map((i) => (
-                  <motion.div key={i} whileHover={{ scale: 1.1, backgroundColor: "rgba(255,255,255,0.1)" }}
-                    className="w-9 h-9 rounded-full bg-white/5 border border-white/10 cursor-pointer transition-colors" />
+                  <motion.div key={i} whileHover={{ scale: 1.1, backgroundColor: "var(--foreground)", opacity: 0.1 }}
+                    className="w-9 h-9 rounded-full bg-foreground/5 border border-foreground/10 cursor-pointer transition-colors" />
                 ))}
               </div>
             </div>
 
             <div>
-              <h5 className="font-black uppercase tracking-widest text-xs mb-6 text-white/60">Platform</h5>
-              <ul className="space-y-3 text-white/30 text-sm">
+              <h5 className="font-black uppercase tracking-widest text-xs mb-6 text-foreground/60">Platform</h5>
+              <ul className="space-y-3 text-foreground/30 text-sm">
                 {["Chapters", "Audio Reciters", "Reading Mode", "Bookmarks"].map((l) => (
                   <li key={l}>
-                    <button type="button" onClick={login} className="hover:text-amber-400 transition-colors text-left">{l}</button>
+                    <button type="button" onClick={login} className="hover:text-brand-gold-dark transition-colors text-left">{l}</button>
                   </li>
                 ))}
               </ul>
             </div>
 
             <div>
-              <h5 className="font-black uppercase tracking-widest text-xs mb-6 text-white/60">Community</h5>
-              <ul className="space-y-3 text-white/30 text-sm">
+              <h5 className="font-black uppercase tracking-widest text-xs mb-6 text-foreground/60">Community</h5>
+              <ul className="space-y-3 text-foreground/30 text-sm">
                 {["Reading Rooms", "Reflections", "Goals", "Activities"].map((l) => (
                   <li key={l}>
-                    <button type="button" onClick={login} className="hover:text-amber-400 transition-colors text-left">{l}</button>
+                    <button type="button" onClick={login} className="hover:text-brand-gold-dark transition-colors text-left">{l}</button>
                   </li>
                 ))}
               </ul>
             </div>
 
             <div>
-              <h5 className="font-black uppercase tracking-widest text-xs mb-6 text-white/60">Newsletter</h5>
-              <p className="text-white/30 text-sm mb-4">Daily inspirations and updates.</p>
+              <h5 className="font-black uppercase tracking-widest text-xs mb-6 text-foreground/60">Newsletter</h5>
+              <p className="text-foreground/30 text-sm mb-4">Daily inspirations and updates.</p>
               <div className="flex gap-2">
                 <input type="email" placeholder="your@email.com"
-                  className="bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 flex-1 text-sm focus:outline-none focus:ring-1 focus:ring-amber-400/50 text-white placeholder:text-white/20" />
+                  className="bg-foreground/5 border border-foreground/10 rounded-xl px-4 py-2.5 flex-1 text-sm focus:outline-none focus:ring-1 focus:ring-brand-gold/50 text-foreground placeholder:text-foreground/20" />
                 <motion.button whileTap={{ scale: 0.95 }} type="button"
-                  className="px-4 py-2.5 rounded-xl gold-gradient text-black font-black text-xs uppercase tracking-wider shrink-0">
+                  className="px-4 py-2.5 rounded-xl gold-gradient text-white dark:text-black font-black text-xs uppercase tracking-wider shrink-0">
                   Join
                 </motion.button>
               </div>
             </div>
           </div>
 
-          <div className="pt-8 border-t border-white/5 flex flex-col md:flex-row items-center justify-between gap-4 text-[10px] font-bold uppercase tracking-widest text-white/15">
-            <p>© 2026 Quran Majeed Premium. All rights reserved.</p>
+          <div className="pt-8 border-t border-foreground/5 flex flex-col md:flex-row items-center justify-between gap-4 text-[10px] font-bold uppercase tracking-widest text-foreground/15">
+            <p>© 2026 Kashaf Premium. All rights reserved.</p>
             <div className="flex gap-8">
-              <Link href="#" className="hover:text-white/40 transition-colors">Privacy</Link>
-              <Link href="#" className="hover:text-white/40 transition-colors">Terms</Link>
-              <Link href="#" className="hover:text-white/40 transition-colors">Cookies</Link>
+              <Link href="#" className="hover:text-foreground/40 transition-colors">Privacy</Link>
+              <Link href="#" className="hover:text-foreground/40 transition-colors">Terms</Link>
+              <Link href="#" className="hover:text-foreground/40 transition-colors">Cookies</Link>
             </div>
           </div>
         </div>

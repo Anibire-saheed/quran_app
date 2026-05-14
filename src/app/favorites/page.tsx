@@ -72,7 +72,7 @@ export default function FavoritesPage() {
       <div className="flex min-h-screen bg-background text-foreground">
         <Sidebar />
         <BottomNav />
-        <main className="flex-1 lg:ml-64 p-10 flex flex-col items-center justify-center">
+        <main className="flex-1 lg:ml-[280px] p-10 flex flex-col items-center justify-center">
           <div className="w-20 h-20 rounded-full bg-red-500/10 flex items-center justify-center mb-8">
             <Heart className="w-10 h-10 text-red-400" />
           </div>
@@ -94,7 +94,7 @@ export default function FavoritesPage() {
       <Sidebar />
       <BottomNav />
 
-      <main className="lg:ml-64 p-6 lg:p-10 max-w-4xl mx-auto">
+      <main className="lg:ml-[280px] p-6 lg:p-10 max-w-4xl mx-auto">
         {/* Header */}
         <div className="flex items-center gap-4 mb-10">
           <div className="w-12 h-12 rounded-2xl bg-red-500/10 flex items-center justify-center shrink-0">

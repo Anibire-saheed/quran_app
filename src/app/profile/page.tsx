@@ -137,6 +137,7 @@ function UserListModal({ title, users, onClose, showRemove }: {
 
 export default function ProfilePage() {
   const { isAuthenticated } = useAuth();
+  const qc = useQueryClient();
   const [showEdit, setShowEdit] = useState(false);
   const [showFollowers, setShowFollowers] = useState(false);
   const [showFollowing, setShowFollowing] = useState(false);
@@ -179,7 +180,7 @@ export default function ProfilePage() {
     return (
       <div className="flex min-h-screen bg-background text-foreground">
         <Sidebar />
-        <main className="flex-1 lg:ml-64 p-10 flex flex-col items-center justify-center">
+        <main className="flex-1 lg:ml-[280px] p-10 flex flex-col items-center justify-center">
           <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="text-center">
             <div className="w-24 h-24 rounded-full bg-slate-100 dark:bg-white/5 flex items-center justify-center mx-auto mb-8">
               <User className="w-12 h-12 text-slate-400" />
@@ -199,12 +200,12 @@ export default function ProfilePage() {
     return (
       <div className="flex min-h-screen bg-background text-foreground">
         <Sidebar />
-        <main className="flex-1 lg:ml-64 p-10 flex flex-col items-center justify-center">
+        <main className="flex-1 lg:ml-[280px] p-10 flex flex-col items-center justify-center">
           <div className="text-center">
             <AlertCircle className="w-16 h-16 text-amber-500 mx-auto mb-6" />
             <h2 className="text-2xl font-black mb-2">Profile Not Found</h2>
             <p className="text-slate-500 mb-8">We couldn't retrieve your profile data. Please try again.</p>
-            <button onClick={() => queryClient.invalidateQueries({ queryKey: ["userProfile"] })} className="px-6 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 font-bold">
+            <button onClick={() => qc.invalidateQueries({ queryKey: ["userProfile"] })} className="px-6 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 font-bold">
               Retry
             </button>
           </div>
@@ -222,7 +223,7 @@ export default function ProfilePage() {
       <Sidebar />
       <BottomNav />
 
-      <main className="lg:ml-64 p-6 lg:p-10 max-w-5xl">
+      <main className="lg:ml-[280px] p-6 lg:p-10 max-w-5xl">
         {/* Profile header */}
         <div className="glass-effect rounded-[40px] p-8 lg:p-12 border-white/5 mb-10 relative overflow-hidden">
           <div className="absolute top-0 right-0 w-64 h-64 bg-brand-gold/10 rounded-full blur-3xl -mr-20 -mt-20" />

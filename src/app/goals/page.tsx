@@ -149,7 +149,7 @@ export default function GoalsPage() {
     return (
       <div className="flex min-h-screen bg-background text-foreground">
         <Sidebar />
-        <main className="flex-1 lg:ml-64 p-10 flex flex-col items-center justify-center">
+        <main className="flex-1 lg:ml-[280px] p-10 flex flex-col items-center justify-center">
           <Target className="w-20 h-20 text-slate-700 mb-8" />
           <h2 className="text-3xl font-black mb-4">Reading Goals</h2>
           <p className="text-slate-500 text-center max-w-md mb-10">
@@ -172,7 +172,7 @@ export default function GoalsPage() {
       <Sidebar />
       <BottomNav />
 
-      <main className="lg:ml-64 p-6 lg:p-10 max-w-4xl mx-auto">
+      <main className="lg:ml-[280px] p-6 lg:p-10 max-w-4xl mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-10">
           <div>

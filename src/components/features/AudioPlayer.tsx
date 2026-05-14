@@ -114,12 +114,12 @@ export default function AudioPlayer() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="absolute -top-6 left-0 right-0 h-6 bg-linear-to-t from-brand-emerald/10 to-transparent pointer-events-none"
+                className="absolute -top-6 left-0 right-0 h-6 bg-linear-to-t from-brand-emerald/10 dark:from-brand-emerald/20 to-transparent pointer-events-none"
               />
             )}
           </AnimatePresence>
 
-          <div className="glass-effect border-t border-black/5 dark:border-white/10 px-4 lg:px-8 py-3 flex items-center justify-between">
+          <div className="glass-effect border-t border-foreground/5 dark:border-white/10 px-4 lg:px-8 py-3 flex items-center justify-between shadow-2xl">
             <audio
               ref={audioRef}
               src={audioSrc || undefined}
@@ -141,14 +141,14 @@ export default function AudioPlayer() {
                 <span className="relative z-10 text-sm">{currentSurah.id}</span>
               </div>
               <div className="min-w-0">
-                <p className="font-bold text-sm truncate text-slate-900 dark:text-white">{currentSurah.name_simple}</p>
-                <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate capitalize">{currentSurah.revelation_place}</p>
+                <p className="font-bold text-sm truncate text-foreground">{currentSurah.name_simple}</p>
+                <p className="text-[11px] text-foreground/50 truncate capitalize">{currentSurah.revelation_place}</p>
               </div>
               <button
                 type="button"
                 title="Close player"
                 onClick={() => setIsPlaying(false)}
-                className="ml-auto p-1 rounded-full text-slate-500 hover:text-white hover:bg-white/5 transition-colors shrink-0"
+                className="ml-auto p-1 rounded-full text-foreground/40 hover:text-foreground hover:bg-foreground/10 transition-colors shrink-0"
               >
                 <X className="w-3.5 h-3.5" />
               </button>
@@ -159,10 +159,10 @@ export default function AudioPlayer() {
               <div className="flex items-center gap-4 lg:gap-6">
                 <motion.button
                   whileTap={{ scale: 0.85 }}
-                  onClick={toggleShuffle}
-                  className={cn("transition-colors", isShuffle ? "text-brand-gold" : "text-slate-400 hover:text-white")}
+                  onClick={toggleRepeat}
+                  className={cn("transition-colors", isRepeat ? "text-brand-emerald dark:text-brand-gold" : "text-foreground/40 hover:text-foreground")}
                 >
-                  <Shuffle className="w-4 h-4" />
+                  <Repeat className="w-4 h-4" />
                 </motion.button>
 
                 <motion.button whileTap={{ scale: 0.85 }} className="text-slate-400 hover:text-white transition-colors">
@@ -176,8 +176,8 @@ export default function AudioPlayer() {
                   className={cn(
                     "w-10 h-10 rounded-full flex items-center justify-center shadow-xl transition-all",
                     audioSrc
-                      ? "bg-white text-black hover:scale-110 hover:shadow-white/20"
-                      : "bg-white/10 text-white/20 cursor-not-allowed"
+                      ? "bg-foreground text-background hover:scale-110 shadow-black/10 dark:shadow-white/5"
+                      : "bg-foreground/10 text-foreground/20 cursor-not-allowed"
                   )}
                 >
                   <AnimatePresence mode="wait" initial={false}>
@@ -199,10 +199,10 @@ export default function AudioPlayer() {
 
                 <motion.button
                   whileTap={{ scale: 0.85 }}
-                  onClick={toggleRepeat}
-                  className={cn("transition-colors", isRepeat ? "text-brand-gold" : "text-slate-400 hover:text-white")}
+                  onClick={toggleShuffle}
+                  className={cn("transition-colors", isShuffle ? "text-brand-emerald dark:text-brand-gold" : "text-foreground/40 hover:text-foreground")}
                 >
-                  <Repeat className="w-4 h-4" />
+                  <Shuffle className="w-4 h-4" />
                 </motion.button>
               </div>
 
@@ -212,18 +212,18 @@ export default function AudioPlayer() {
                   {formatTime(audioRef.current?.currentTime || 0)}
                 </span>
                 <div
-                  className="flex-1 h-1.5 bg-white/10 rounded-full overflow-visible group cursor-pointer relative"
+                  className="flex-1 h-1.5 bg-foreground/10 rounded-full overflow-visible group cursor-pointer relative"
                   onClick={handleSeek}
                 >
-                  <div
-                    className="progress-fill absolute inset-y-0 left-0 bg-brand-emerald-light rounded-full transition-[width] duration-100 flex items-center justify-end"
-                    style={{ "--fill": `${progress}%` } as React.CSSProperties}
-                  >
-                    <motion.div
-                      className="w-3 h-3 bg-white rounded-full shadow-lg shadow-black/40 opacity-0 group-hover:opacity-100 transition-opacity translate-x-1/2 shrink-0"
-                      whileHover={{ scale: 1.3 }}
-                    />
-                  </div>
+                    <div
+                      className="progress-fill absolute inset-y-0 left-0 bg-brand-emerald dark:bg-brand-emerald-light rounded-full transition-[width] duration-100 flex items-center justify-end"
+                      style={{ "--fill": `${progress}%` } as React.CSSProperties}
+                    >
+                      <motion.div
+                        className="w-3 h-3 bg-foreground rounded-full shadow-lg shadow-black/40 opacity-0 group-hover:opacity-100 transition-opacity translate-x-1/2 shrink-0"
+                        whileHover={{ scale: 1.3 }}
+                      />
+                    </div>
                 </div>
                 <span className="text-[10px] text-slate-500 dark:text-slate-400 font-mono w-8 tabular-nums">
                   {formatTime(duration)}
@@ -244,7 +244,7 @@ export default function AudioPlayer() {
                   value={volume}
                   onChange={(e) => setVolume(parseFloat(e.target.value))}
                   aria-label="Volume"
-                  className="w-24 h-1 bg-white/10 rounded-full appearance-none cursor-pointer accent-brand-emerald-light"
+                  className="w-24 h-1 bg-foreground/10 rounded-full appearance-none cursor-pointer accent-brand-emerald-light dark:accent-brand-gold"
                 />
               </div>
             </div>

@@ -20,7 +20,7 @@ export default function CollectionsPage() {
     return (
       <div className="flex min-h-screen bg-background text-foreground">
         <Sidebar />
-        <main className="flex-1 lg:ml-64 p-10 flex flex-col items-center justify-center">
+        <main className="flex-1 lg:ml-[280px] p-10 flex flex-col items-center justify-center">
           <FolderOpen className="w-20 h-20 text-slate-800 mb-8" />
           <h2 className="text-3xl font-black mb-4">Your Library</h2>
           <p className="text-slate-500 text-center max-w-md mb-10">
@@ -38,7 +38,7 @@ export default function CollectionsPage() {
     <div className="flex min-h-screen bg-background text-foreground">
       <Sidebar />
       
-      <main className="flex-1 lg:ml-64 p-8">
+      <main className="flex-1 lg:ml-[280px] p-8">
         <header className="flex items-center justify-between mb-12">
           <div>
             <h1 className="text-4xl font-bold text-white mb-2">My Collections</h1>

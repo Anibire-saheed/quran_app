@@ -16,7 +16,7 @@ export default function BookmarksPage() {
     <div className="flex min-h-screen bg-background text-foreground">
       <Sidebar />
       
-      <main className="flex-1 lg:ml-64 p-8">
+      <main className="flex-1 lg:ml-[280px] p-8">
         <header className="mb-12">
           <h1 className="text-4xl font-bold text-white mb-2">My Bookmarks</h1>
           <p className="text-slate-400">Your personal reading markers and saved locations across the Quran.</p>

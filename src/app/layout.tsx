@@ -5,6 +5,7 @@ import QueryProvider from "@/providers/QueryProvider";
 import AuthProvider from "@/providers/AuthProvider";
 import AudioPlayer from "@/components/features/AudioPlayer";
 import ThemeProvider from "@/providers/ThemeProvider";
+import { Toaster } from "sonner";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -35,6 +36,7 @@ export default function RootLayout({
             <ThemeProvider>
               {children}
               <AudioPlayer />
+              <Toaster richColors position="top-right" />
             </ThemeProvider>
           </QueryProvider>
         </AuthProvider>

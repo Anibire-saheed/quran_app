@@ -45,7 +45,7 @@ export default function ActivitiesPage() {
     return (
       <div className="flex min-h-screen bg-background text-foreground">
         <Sidebar />
-        <main className="flex-1 lg:ml-64 p-10 flex flex-col items-center justify-center">
+        <main className="flex-1 lg:ml-[280px] p-10 flex flex-col items-center justify-center">
           <Activity className="w-20 h-20 text-slate-800 mb-8" />
           <h2 className="text-3xl font-black mb-4">Track Your Progress</h2>
           <p className="text-slate-500 text-center max-w-md mb-10">
@@ -70,7 +70,7 @@ export default function ActivitiesPage() {
       <Sidebar />
       <BottomNav />
 
-      <main className="flex-1 lg:ml-64 p-6 lg:p-10 max-w-6xl">
+      <main className="flex-1 lg:ml-[280px] p-6 lg:p-10 max-w-6xl">
         <header className="mb-10">
           <h1 className="text-4xl font-bold mb-2 flex items-center gap-3">
             <Activity className="w-9 h-9 text-brand-emerald-light" />

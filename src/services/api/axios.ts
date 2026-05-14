@@ -22,7 +22,6 @@ const QURAN_FOUNDATION_API_URL = process.env.NEXT_PUBLIC_QF_CONTENT_BASE_URL || 
 const QURAN_FOUNDATION_SEARCH_URL = process.env.NEXT_PUBLIC_QF_SEARCH_BASE_URL || 'https://apis-prelive.quran.foundation/search';
 const QURAN_FOUNDATION_AUTH_URL = process.env.NEXT_PUBLIC_QF_AUTH_BASE_URL || 'https://apis-prelive.quran.foundation/quran-reflect';
 const QURAN_FOUNDATION_REFLECT_URL = process.env.NEXT_PUBLIC_QF_REFLECT_BASE_URL || 'https://apis-prelive.quran.foundation/quran-reflect';
-const QURAN_FOUNDATION_OAUTH_URL = process.env.NEXT_PUBLIC_QF_OAUTH_BASE_URL || 'https://prelive-oauth2.quran.foundation';
 
 const CLIENT_ID = process.env.NEXT_PUBLIC_QF_CLIENT_ID;
 const CONTENT_CLIENT_ID = process.env.NEXT_PUBLIC_QF_CONTENT_CLIENT_ID || CLIENT_ID;
@@ -87,6 +86,24 @@ const _authInterceptor = (config: any) => {
 
 quranAuthApi.interceptors.request.use(_authInterceptor);
 quranReflectApi.interceptors.request.use(_authInterceptor);
+
+// Log server error details for 4xx responses so the message isn't swallowed
+const _errorLogger = (error: any) => {
+  if (error?.response?.status >= 400 && error?.response?.status < 500) {
+    console.error(
+      `[API ${error.response.status}]`,
+      error.config?.method?.toUpperCase(),
+      error.config?.url,
+      '\nPayload:', error.config?.data,
+      '\nServer response:', JSON.stringify(error.response.data),
+    );
+  }
+  return Promise.reject(error);
+};
+
+[quranApi, quranSearchApi, quranAuthApi, quranReflectApi].forEach(instance =>
+  instance.interceptors.response.use(undefined, _errorLogger)
+);
 
 /**
  * Sets the Content API token (obtained via client_credentials)
