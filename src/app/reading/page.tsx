@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { fetchSurahs, fetchReadingSessions, fetchJuzs } from "@/services/quranService";
 import Sidebar from "@/components/layout/Sidebar";
 import BottomNav from "@/components/layout/BottomNav";
-import { BookOpen, Search, ArrowRight, Clock, Sparkles } from "lucide-react";
+import { BookOpen, Search, ArrowRight, Clock, Sparkles, ChevronRight } from "lucide-react";
 import { useState } from "react";
 import Link from "next/link";
 import { BookIcon } from "@/components/ui/BookIcon";
