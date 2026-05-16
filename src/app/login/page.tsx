@@ -10,10 +10,7 @@ export default function SignInPage() {
       process.env.NEXT_PUBLIC_QF_OAUTH_BASE_URL ||
       "https://prelive-oauth2.quran.foundation";
     const clientId = process.env.NEXT_PUBLIC_QF_CLIENT_ID || "";
-    const redirectUri =
-      typeof window !== 'undefined'
-        ? `${window.location.origin}/callback`
-        : (process.env.NEXT_PUBLIC_QF_OAUTH_REDIRECT_URI || "http://localhost:3000/callback");
+    const redirectUri = process.env.NEXT_PUBLIC_QF_OAUTH_REDIRECT_URI || `${window.location.origin}/callback`;
 
     // PKCE and OIDC security params
     const codeVerifier = await generateCodeVerifier();
