@@ -210,8 +210,8 @@ export const fetchCommentReplies = async (id: number, params?: { limit?: number;
 /**
  * GET LOGGED-IN USER PROFILE
  */
-export const fetchUserProfile = async (params?: { qdc?: boolean }) => {
-  const { data } = await quranReflectApi.get('/v1/users/profile', { params });
+export const fetchUserProfile = async (params?: { qdc?: boolean }, silent?: boolean) => {
+  const { data } = await quranReflectApi.get('/v1/users/profile', { params, silent } as any);
   return data;
 };
 

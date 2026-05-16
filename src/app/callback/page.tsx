@@ -14,11 +14,34 @@ function CallbackHandler() {
       if (!code) return;
 
       try {
-        const response = await axios.post("/api/auth/token", { code });
+        const storedState = localStorage.getItem("qf_auth_state");
+        const codeVerifier = localStorage.getItem("qf_auth_verifier");
+        const redirectUri = localStorage.getItem("qf_auth_redirect_uri");
+        
+        // Basic state validation
+        const receivedState = searchParams.get("state");
+        if (storedState && receivedState !== storedState) {
+          console.error("State mismatch!");
+          router.push("/login?error=state_mismatch");
+          return;
+        }
+
+        const response = await axios.post("/api/auth/token", { 
+          code, 
+          codeVerifier,
+          redirectUri
+        });
 
         const { access_token, user } = response.data;
         if (access_token) {
           localStorage.setItem("qf_access_token", access_token);
+          
+          // Clear auth session
+          localStorage.removeItem("qf_auth_state");
+          localStorage.removeItem("qf_auth_nonce");
+          localStorage.removeItem("qf_auth_verifier");
+          localStorage.removeItem("qf_auth_redirect_uri");
+
           if (user) {
             localStorage.setItem("qf_user", JSON.stringify(user));
           }

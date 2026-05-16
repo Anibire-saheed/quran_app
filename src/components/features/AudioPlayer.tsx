@@ -15,10 +15,12 @@ export default function AudioPlayer() {
   const [duration, setDuration] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
 
+  const surahId = typeof currentSurah === 'object' ? currentSurah?.id : currentSurah;
+
   const { data: audioFile } = useQuery({
-    queryKey: ["audio", currentReciter, currentSurah?.id],
-    queryFn: () => fetchAudioByChapter(currentReciter, currentSurah?.id, true),
-    enabled: !!currentSurah && !!currentReciter,
+    queryKey: ["audio", currentReciter, surahId],
+    queryFn: () => fetchAudioByChapter(currentReciter, String(surahId), true),
+    enabled: !!surahId && !!currentReciter,
   });
 
   const audioSrc = audioFile?.audio_url
@@ -138,11 +140,11 @@ export default function AudioPlayer() {
                     transition={{ duration: 1.5, repeat: Infinity }}
                   />
                 )}
-                <span className="relative z-10 text-sm">{currentSurah.id}</span>
+                <span className="relative z-10 text-sm">{surahId}</span>
               </div>
               <div className="min-w-0">
-                <p className="font-bold text-sm truncate text-foreground">{currentSurah.name_simple}</p>
-                <p className="text-[11px] text-foreground/50 truncate capitalize">{currentSurah.revelation_place}</p>
+                <p className="font-bold text-sm truncate text-foreground">{currentSurah?.name_simple || `Surah ${surahId}`}</p>
+                <p className="text-[11px] text-foreground/50 truncate capitalize">{currentSurah?.revelation_place || ''}</p>
               </div>
               <button
                 type="button"

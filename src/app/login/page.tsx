@@ -2,25 +2,40 @@
 
 import { ArrowRight, BookOpen, Headphones, Target, Users, Sparkles } from "lucide-react";
 import Image from "next/image";
+import { generateCodeVerifier, generateCodeChallenge, generateRandomString } from "@/utils/pkce";
 
 export default function SignInPage() {
-  const handleOAuthLogin = () => {
+  const handleOAuthLogin = async () => {
     const oauthBase =
       process.env.NEXT_PUBLIC_QF_OAUTH_BASE_URL ||
       "https://prelive-oauth2.quran.foundation";
     const clientId = process.env.NEXT_PUBLIC_QF_CLIENT_ID || "";
     const redirectUri =
-      process.env.NEXT_PUBLIC_QF_OAUTH_REDIRECT_URI ||
-      "http://localhost:3000/callback";
+      typeof window !== 'undefined'
+        ? `${window.location.origin}/callback`
+        : (process.env.NEXT_PUBLIC_QF_OAUTH_REDIRECT_URI || "http://localhost:3000/callback");
+
+    // PKCE and OIDC security params
+    const codeVerifier = await generateCodeVerifier();
+    const codeChallenge = await generateCodeChallenge(codeVerifier);
+    const state = generateRandomString(16);
+    const nonce = generateRandomString(16);
+
+    // Store for callback
+    localStorage.setItem("qf_auth_state", state);
+    localStorage.setItem("qf_auth_nonce", nonce);
+    localStorage.setItem("qf_auth_verifier", codeVerifier);
+    localStorage.setItem("qf_auth_redirect_uri", redirectUri);
 
     const url = new URL(`${oauthBase}/oauth2/auth`);
     url.searchParams.append("client_id", clientId);
     url.searchParams.append("redirect_uri", redirectUri);
     url.searchParams.append("response_type", "code");
-    url.searchParams.append("scope", "openid profile");
-
-    const state = Math.random().toString(36).substring(2, 15);
+    url.searchParams.append("scope", "openid profile email offline_access user collection");
     url.searchParams.append("state", state);
+    url.searchParams.append("nonce", nonce);
+    url.searchParams.append("code_challenge", codeChallenge);
+    url.searchParams.append("code_challenge_method", "S256");
 
     window.location.href = url.toString();
   };

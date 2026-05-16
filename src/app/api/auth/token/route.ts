@@ -3,7 +3,7 @@ import axios from "axios";
 
 export async function POST(request: Request) {
   try {
-    const { code } = await request.json();
+    const { code, codeVerifier, redirectUri } = await request.json();
 
     if (!code) {
       return NextResponse.json({ error: "Missing code" }, { status: 400 });
@@ -13,13 +13,19 @@ export async function POST(request: Request) {
     const clientSecret = process.env.QF_CLIENT_SECRET || "";
     const auth = Buffer.from(`${clientId}:${clientSecret}`).toString("base64");
 
+    const params = new URLSearchParams({
+      grant_type: "authorization_code",
+      code,
+      redirect_uri: redirectUri || process.env.NEXT_PUBLIC_QF_OAUTH_REDIRECT_URI || "http://localhost:3000/callback",
+    });
+
+    if (codeVerifier) {
+      params.append("code_verifier", codeVerifier);
+    }
+
     const response = await axios.post(
       `${process.env.NEXT_PUBLIC_QF_OAUTH_BASE_URL}/oauth2/token`,
-      new URLSearchParams({
-        grant_type: "authorization_code",
-        code,
-        redirect_uri: process.env.NEXT_PUBLIC_QF_OAUTH_REDIRECT_URI || "http://localhost:3000/callback",
-      }),
+      params,
       {
         headers: {
           "Content-Type": "application/x-www-form-urlencoded",

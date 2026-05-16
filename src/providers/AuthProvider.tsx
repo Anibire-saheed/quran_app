@@ -56,27 +56,34 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
         const storedUser = localStorage.getItem("qf_user");
 
         if (storedToken) {
-          setAccessToken(storedToken);
           setAuthToken(storedToken);
-          
-          if (storedUser) {
-            setUser(JSON.parse(storedUser));
-          } else {
-            // Token exists but user info is missing - fetch it
-            try {
-              const response = await fetchUserProfile({ qdc: true });
-              const userData = response?.user ?? response?.data ?? response;
-              
-              if (userData) {
-                // Normalize name
-                if (!userData.name) {
-                  userData.name = `${userData.firstName ?? ""} ${userData.lastName ?? ""}`.trim() || userData.username || "User";
-                }
-                setUser(userData);
-                localStorage.setItem("qf_user", JSON.stringify(userData));
+
+          // Always validate the token by fetching the profile.
+          // silent=true suppresses the axios error logger — a 403 here is expected when the token has expired.
+          try {
+            const response = await fetchUserProfile({ qdc: true }, true);
+            const userData = response?.user ?? response?.data ?? response;
+
+            if (userData) {
+              if (!userData.name) {
+                userData.name = `${userData.firstName ?? ""} ${userData.lastName ?? ""}`.trim() || userData.username || "User";
               }
-            } catch (err: any) {
-              console.warn("Profile fetch failed, but keeping session:", err);
+              setAccessToken(storedToken);
+              setUser(userData);
+              localStorage.setItem("qf_user", JSON.stringify(userData));
+            }
+          } catch (err: any) {
+            const status = err?.response?.status;
+            if (status === 401 || status === 403) {
+              // Token is expired/invalid — clear stale session
+              localStorage.removeItem("qf_access_token");
+              localStorage.removeItem("qf_user");
+              setAuthToken("");
+            } else {
+              // Network error etc. — restore from cache to stay usable offline
+              console.warn("Profile fetch failed, restoring from cache:", err);
+              setAccessToken(storedToken);
+              if (storedUser) setUser(JSON.parse(storedUser));
             }
           }
         }
